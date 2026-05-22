@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expansão · Franquias Lig Chopp · Germânia</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  min-width: 1280px;
+}
+
+/* ══════════════════════════════════════════════
+   DARK MODE (padrão)
+══════════════════════════════════════════════ */
+:root[data-theme="dark"] {
+  --bg:        #1A1208;
+  --bg2:       #221A0E;
+  --bg3:       #2C2214;
+  --card-bg:   #261E12;
+  --card-bd:   rgba(255,200,120,0.10);
+  --txt:       #F1E3CE;
+  --txt-faint: rgba(241,227,206,0.45);
+  --gold:      #FFA62C;
+  --gold-lt:   #FFB84D;
+  --red:       #C92B1E;
+  --red-bg:    rgba(201,43,30,0.12);
+  --circ-bg:   #3A2A14;
+  --green:     #4CAF7D;
+  --amber:     #FFA62C;
+  --border:    rgba(255,200,120,0.10);
+}
+:root[data-theme="light"] {
+  --bg:        #F8F2E8;
+  --bg2:       #EFE6D4;
+  --bg3:       #E5D9C2;
+  --card-bg:   #FFFFFF;
+  --card-bd:   rgba(100,70,20,0.15);
+  --txt:       #2A1C08;
+  --txt-faint: rgba(42,28,8,0.5);
+  --gold:      #C8941A;
+  --gold-lt:   #E0A82C;
+  --red:       #C92B1E;
+  --red-bg:    rgba(201,43,30,0.08);
+  --circ-bg:   #EFE6D4;
+  --green:     #2E7D52;
+  --amber:     #C8941A;
+  --border:    rgba(100,70,20,0.15);
+}
+
+body { background: var(--bg); color: var(--txt); }
+
+/* ══════════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════════ */
+.header {
+  background: var(--red);
+  padding: 0;
+  margin-bottom: 0;
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 28px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.h-logo {
+  width: 52px;
+  height: 52px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -1px;
+}
+.h-brand { flex: 1; }
+.eyebrow {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,230,200,0.6);
+  margin-bottom: 2px;
+}
+.h-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+}
+.h-div {
+  width: 1px;
+  height: 40px;
+  background: rgba(255,255,255,0.2);
+  flex-shrink: 0;
+}
+.h-resumo-lbl {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,230,200,0.5);
+  margin-bottom: 4px;
+}
+.h-kpis {
+  display: flex;
+  gap: 24px;
+}
+.hk { display: flex; flex-direction: column; gap: 1px; }
+.hk-l {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255,230,200,0.5);
+}
+.hk-v {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #FFA62C;
+  line-height: 1;
+}
+.h-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+.dark-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+.dark-toggle-lbl {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(255,230,200,0.6);
+}
+.dark-toggle-track {
+  width: 34px;
+  height: 18px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 9px;
+  position: relative;
+  transition: background 0.2s;
+}
+:root[data-theme="dark"] .dark-toggle-track { background: rgba(255,166,44,0.4); }
+.dark-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+:root[data-theme="dark"] .dark-toggle-thumb { transform: translateX(16px); }
+
+/* ══════════════════════════════════════════════
+   TABS
+══════════════════════════════════════════════ */
+.tabs-wrap {
+  background: var(--red);
+  border-bottom: 3px solid rgba(0,0,0,0.2);
+  margin-top: 0;
+}
+.tabs {
+  display: flex;
+  padding: 0 28px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.tab {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: rgba(255,230,200,0.65);
+  padding: 10px 20px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -3px;
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+.tab:hover:not(.active) { color: rgba(255,255,255,0.9); }
+.tab.active {
+  color: #FFA62C;
+  background: var(--bg2);
+  border-bottom-color: #FFA62C;
+}
+
+/* ══════════════════════════════════════════════
+   TAB PANELS
+══════════════════════════════════════════════ */
+.tab-panel {
+  display: none;
+}
+.tab-panel.active {
+  display: block;
+}
+
+/* ══════════════════════════════════════════════
+   MAIN CONTENT WRAPPER
+══════════════════════════════════════════════ */
+.panel-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px 28px;
+}
+
+/* ══════════════════════════════════════════════
+   KPI ROW (.mkpi)
+══════════════════════════════════════════════ */
+.mkpi-row {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.mkpi-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.mkpi-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+.mkpi {
+  background: var(--card-bg);
+  border: 1px solid var(--card-bd);
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+.mkpi-v {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--txt);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.mkpi-l {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--txt-faint);
+}
+.mkpi-sub {
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  color: var(--txt-faint);
+  margin-top: 2px;
+}
+
+/* ══════════════════════════════════════════════
+   CARDS
+══════════════════════════════════════════════ */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-bd);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.card-header {
+  margin-bottom: 16px;
+}
+.c-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 2px;
+}
+.c-sub {
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  color: var(--txt-faint);
+}
+
+/* ══════════════════════════════════════════════
+   GRID 2 COLUNAS
+══════════════════════════════════════════════ */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* ══════════════════════════════════════════════
+   TABLES (.ez-table)
+══════════════════════════════════════════════ */
+.ez-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+}
+.ez-table th {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--txt-faint);
+  border-bottom: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+}
+.ez-table th.right, .ez-table td.right { text-align: right; }
+.ez-table td {
+  padding: 8px 10px;
+  color: var(--txt);
+  border-bottom: 1px solid rgba(255,200,120,0.05);
+}
+.ez-table tr:last-child td { border-bottom: none; }
+.ez-table tr:hover td { background: rgba(255,166,44,0.04); }
+.ez-table .highlight-red td { color: var(--red); font-weight: 600; }
+
+/* ══════════════════════════════════════════════
+   BADGES DE DIAS
+══════════════════════════════════════════════ */
+.badge-dias {
+  display: inline-block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.dias-ok   { background: rgba(76,175,125,0.15); color: #4CAF7D; }
+.dias-warn { background: rgba(255,166,44,0.15);  color: #FFA62C; }
+.dias-crit { background: rgba(201,43,30,0.18);   color: #E05548; }
+
+/* ══════════════════════════════════════════════
+   ALERT BOX
+══════════════════════════════════════════════ */
+.alert-box {
+  background: rgba(201,43,30,0.15);
+  border: 1px solid rgba(201,43,30,0.4);
+  border-left: 4px solid var(--red);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  color: #E88070;
+  line-height: 1.5;
+}
+.alert-box strong { color: #E05548; }
+
+/* ══════════════════════════════════════════════
+   FUNIL (barras horizontais)
+══════════════════════════════════════════════ */
+.funil-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.funil-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.funil-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--txt-faint);
+  width: 250px;
+  flex-shrink: 0;
+  text-align: right;
+}
+.funil-bar-wrap {
+  flex: 1;
+  height: 28px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+.funil-bar {
+  height: 100%;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  transition: width 0.4s ease;
+  min-width: 40px;
+}
+.funil-count {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════════
+   GRÁFICO DE BARRAS (SVG simples)
+══════════════════════════════════════════════ */
+.bar-chart-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* ══════════════════════════════════════════════
+   FOOTER / NOTAS DE RODAPÉ
+══════════════════════════════════════════════ */
+.footnote {
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  color: var(--txt-faint);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* ══════════════════════════════════════════════
+   STATUS CHIP
+══════════════════════════════════════════════ */
+.chip {
+  display: inline-block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.chip-active  { background: rgba(76,175,125,0.15);  color: #4CAF7D; }
+.chip-paused  { background: rgba(255,166,44,0.12);  color: #FFA62C; }
+
+/* ══════════════════════════════════════════════
+   SECTION DIVIDER
+══════════════════════════════════════════════ */
+.section-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--txt-faint);
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ══════════════════════════════════════════════
+   LAST UPDATED
+══════════════════════════════════════════════ */
+.last-updated {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  color: rgba(255,230,200,0.4);
+  margin-left: 16px;
+}
+
+/* ══════════════════════════════════════════════
+   LOADING / ERROR OVERLAYS
+══════════════════════════════════════════════ */
+#loading-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26,18,8,0.7);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+}
+#loading-overlay.visible { display: flex; }
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid rgba(255,255,255,0.15);
+  border-top-color: #C92B1E;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-txt {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+}
+#error-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26,18,8,0.82);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+}
+#error-overlay.visible { display: flex; }
+.error-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #FFA62C;
+}
+.error-msg {
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  color: rgba(241,227,206,0.6);
+  text-align: center;
+  max-width: 400px;
+}
+.btn-reload {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: var(--red);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-reload:hover { background: #a82318; }
+
+/* ══════════════════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════════════════ */
+.empty-state {
+  text-align: center;
+  padding: 32px 0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--txt-faint);
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="h-logo">G</div>
+    <div class="h-brand">
+      <div class="eyebrow">Germânia · Cervejaria · Dashboard Comercial</div>
+      <div class="h-title">Expansão / Franquias Lig Chopp</div>
+    </div>
+    <div class="h-div"></div>
+    <div>
+      <div class="h-resumo-lbl">Resumo Geral</div>
+      <div class="h-kpis">
+        <div class="hk">
+          <div class="hk-l">Total Leads</div>
+          <div class="hk-v" id="hk-total">--</div>
+        </div>
+        <div class="hk">
+          <div class="hk-l">Ativos</div>
+          <div class="hk-v" id="hk-ativos">--</div>
+        </div>
+        <div class="hk">
+          <div class="hk-l">Assinaturas</div>
+          <div class="hk-v" id="hk-assinaturas">--</div>
+        </div>
+      </div>
+    </div>
+    <div class="h-actions">
+      <span class="last-updated" id="last-updated"></span>
+      <label class="dark-toggle" onclick="toggleDark()" title="Alternar tema">
+        <span class="dark-toggle-lbl" id="dark-lbl">Claro</span>
+        <span class="dark-toggle-track">
+          <span class="dark-toggle-thumb"></span>
+        </span>
+      </label>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════
+     TABS NAV
+═══════════════════════════════════════════ -->
+<nav class="tabs-wrap">
+  <div class="tabs">
+    <div class="tab active"  onclick="switchTab('visao',this)">Visão Geral</div>
+    <div class="tab"         onclick="switchTab('sdr',this)">SDR / Mirian</div>
+    <div class="tab"         onclick="switchTab('expansao',this)">Time Expansão</div>
+    <div class="tab"         onclick="switchTab('ads',this)">ADS &amp; Campanhas</div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     PAINEL 1 — VISÃO GERAL
+═══════════════════════════════════════════ -->
+<div id="panel-visao" class="tab-panel active">
+  <div class="panel-inner">
+
+    <!-- KPIs -->
+    <div class="mkpi-row cols-4">
+      <div class="mkpi">
+        <div class="mkpi-v" id="vg-total">--</div>
+        <div class="mkpi-l">Total de Leads</div>
+      </div>
+      <div class="mkpi">
+        <div class="mkpi-v" id="vg-ativos">--</div>
+        <div class="mkpi-l">Ativos (Em Andamento)</div>
+      </div>
+      <div class="mkpi">
+        <div class="mkpi-v" id="vg-perdidos">--</div>
+        <div class="mkpi-l">Perdidos</div>
+      </div>
+      <div class="mkpi">
+        <div class="mkpi-v" id="vg-cpl">--</div>
+        <div class="mkpi-l">CPL Médio</div>
+        <div class="mkpi-sub">Investimento ADS ÷ leads</div>
+      </div>
+    </div>
+
+    <!-- Funil -->
+    <div class="card">
+      <div class="card-header">
+        <div class="c-title">Funil de Expansão</div>
+        <div class="c-sub">Volume de leads por etapa — excluindo perdidos</div>
+      </div>
+      <div id="funil-container" class="funil-row">
+        <div class="empty-state">Aguardando dados...</div>
+      </div>
+    </div>
+
+    <!-- Timeline semanal -->
+    <div class="card">
+      <div class="card-header">
+        <div class="c-title">Leads por Semana</div>
+        <div class="c-sub">Novos leads criados por semana (data de criação)</div>
+      </div>
+      <div id="timeline-container">
+        <div class="empty-state">Aguardando dados...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAINEL 2 — SDR / MIRIAN
+═══════════════════════════════════════════ -->
+<div id="panel-sdr" class="tab-panel">
+  <div class="panel-inner">
+
+    <!-- KPIs -->
+    <div class="mkpi-row cols-3">
+      <div class="mkpi">
+        <div class="mkpi-v" id="sdr-total">--</div>
+        <div class="mkpi-l">Leads Recebidos</div>
+        <div class="mkpi-sub">Total no CRM (SDR)</div>
+      </div>
+      <div class="mkpi">
+        <div class="mkpi-v" id="sdr-qualif">--</div>
+        <div class="mkpi-l">Qualificados</div>
+        <div class="mkpi-sub">Encaminhados à Expansão</div>
+      </div>
+      <div class="mkpi">
+        <div class="mkpi-v" id="sdr-taxa">--</div>
+        <div class="mkpi-l">Taxa de Qualificação</div>
+        <div class="mkpi-sub">Qualificados ÷ total</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Motivos de perda SDR -->
+      <div class="card">
+        <div class="card-header">
+          <div class="c-title">Motivos de Perda — SDR</div>
+          <div class="c-sub">Leads perdidos com responsável SDR (Mirian / Gabriel Costa)</div>
+        </div>
+        <div id="sdr-perda-container">
+          <div class="empty-state">Aguardando dados...</div>
+        </div>
+      </div>
+
+      <!-- Pipeline ativo SDR -->
+      <div class="card">
+        <div class="card-header">
+          <div class="c-title">Pipeline Ativo — SDR</div>
+          <div class="c-sub">Leads em andamento nas etapas 1–3</div>
+        </div>
+        <div id="sdr-pipeline-container">
+          <div class="empty-state">Aguardando dados...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ritmo semanal SDR -->
+    <div class="card">
+      <div class="card-header">
+        <div class="c-title">Ritmo Semanal — Leads SDR</div>
+        <div class="c-sub">Leads recebidos pelo SDR por semana</div>
+      </div>
+      <div id="sdr-semanal-container">
+        <div class="empty-state">Aguardando dados...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAINEL 3 — TIME EXPANSÃO
+═══════════════════════════════════════════ -->
+<div id="panel-expansao" class="tab-panel">
+  <div class="panel-inner">
+
+    <!-- KPIs -->
+    <div class="mkpi-row cols-4">
+      <div class="mkpi">
+        <div class="mkpi-v" id="exp-total">--</div>
+        <div class="mkpi-l">Leads Recebidos</div>
+        <div class="mkpi-sub">Etapas 4–6</div>
+      </div>
+      <div class="mkpi">
+        <div class="mkpi-v" id="exp-dias-cc">--</div>
+        <div class="mkpi-l">Média Dias — Contato Comercial</div>
+        <div class="mkpi-sub">Leads ativos nessa etapa</div>
+      </div>
+      <div class="mkpi">
+        <div class="mkpi-v" id="exp-dias-ap">--</div>
+        <div class="mkpi-l">Média Dias — Apresentação</div>
+        <div class="mkpi-sub">Leads ativos nessa etapa</div>
+      </div>
+      <div class="mkpi">
+        <div class="mkpi-v" id="exp-assin">--</div>
+        <div class="mkpi-l">Assinaturas</div>
+        <div class="mkpi-sub">Contratos assinados</div>
+      </div>
+    </div>
+
+    <!-- Alert box -->
+    <div class="alert-box" id="exp-alert">
+      Aguardando dados...
+    </div>
+
+    <!-- Leads ativos com dias parados -->
+    <div class="card">
+      <div class="card-header">
+        <div class="c-title">Leads Ativos — Dias no Pipeline</div>
+        <div class="c-sub">Contato Comercial e Apresentação · ordenado por mais antigo</div>
+      </div>
+      <div id="exp-ativos-container">
+        <div class="empty-state">Aguardando dados...</div>
+      </div>
+      <p class="footnote">* Dias calculados desde a criação do lead — RD Station não exporta data de entrada por etapa.</p>
+    </div>
+
+    <div class="grid-2">
+      <!-- Por responsável -->
+      <div class="card">
+        <div class="card-header">
+          <div class="c-title">Por Responsável</div>
+          <div class="c-sub">Total e perdidos por agente</div>
+        </div>
+        <div id="exp-resp-container">
+          <div class="empty-state">Aguardando dados...</div>
+        </div>
+      </div>
+
+      <!-- Pipeline etapas -->
+      <div class="card">
+        <div class="card-header">
+          <div class="c-title">Pipeline por Etapa</div>
+          <div class="c-sub">Contagem atual por etapa de expansão</div>
+        </div>
+        <div id="exp-pipeline-container">
+          <div class="empty-state">Aguardando dados...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Motivos de perda expansão -->
+    <div class="card">
+      <div class="card-header">
+        <div class="c-title">Motivos de Perda — Time Expansão</div>
+        <div class="c-sub">Leads perdidos com responsável do time de expansão</div>
+      </div>
+      <div id="exp-perda-container">
+        <div class="empty-state">Aguardando dados...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAINEL 4 — ADS & CAMPANHAS
+═══════════════════════════════════════════ -->
+<div id="panel-ads" class="tab-panel">
+  <div class="panel-inner">
+
+    <!-- KPIs -->
+    <div class="mkpi-row cols-4">
+      <div class="mkpi">
+        <div class="mkpi-v" id="ads-invest">--</div>
+        <div class="mkpi-l">Investimento Total</div>
+        <div class="mkpi-sub">Meta Ads (período)</div>
+      </div>
+      <div class="mkpi">
+        <div class="mkpi-v" id="ads-cpl">--</div>
+        <div class="mkpi-l">CPL Médio</div>
+        <div class="mkpi-sub">Investimento ÷ leads</div>
+      </div>
+      <div class="mkpi">
+        <div class="mkpi-v" id="ads-leads">--</div>
+        <div class="mkpi-l">Leads Gerados (ADS)</div>
+        <div class="mkpi-sub">Soma de resultados</div>
+      </div>
+      <div class="mkpi">
+        <div class="mkpi-v" id="ads-ativas">--</div>
+        <div class="mkpi-l">Campanhas Ativas</div>
+        <div class="mkpi-sub">Veiculação = active</div>
+      </div>
+    </div>
+
+    <!-- Tabela de campanhas -->
+    <div class="card">
+      <div class="card-header">
+        <div class="c-title">Campanhas</div>
+        <div class="c-sub">Agrupado por campanha · ordenado por investimento</div>
+      </div>
+      <div id="ads-campanhas-container">
+        <div class="empty-state">Aguardando dados...</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- CPL por campanha (barras) -->
+      <div class="card">
+        <div class="card-header">
+          <div class="c-title">CPL por Campanha</div>
+          <div class="c-sub">Custo por lead em cada campanha</div>
+        </div>
+        <div id="ads-cpl-chart">
+          <div class="empty-state">Aguardando dados...</div>
+        </div>
+      </div>
+
+      <!-- Leads por fonte (CRM) -->
+      <div class="card">
+        <div class="card-header">
+          <div class="c-title">Leads por Fonte (CRM)</div>
+          <div class="c-sub">Coluna Fonte da base CRM</div>
+        </div>
+        <div id="ads-fontes-container">
+          <div class="empty-state">Aguardando dados...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     OVERLAYS
+═══════════════════════════════════════════ -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-txt">Carregando dados...</div>
+</div>
+
+<div id="error-overlay">
+  <div class="error-title">Erro ao carregar dados</div>
+  <div class="error-msg" id="error-detail">Não foi possível buscar os dados. Verifique se as URLs dos Sheets estão corretas e se o documento está publicado.</div>
+  <button class="btn-reload" onclick="fetchAll()">Tentar novamente</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCRIPT
+═══════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ─── URLs das planilhas — substituir antes do deploy ─── */
+const URLS = {
+  crm: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFZGcNG9xe0T8D8NM1pKdE8WsLLDg3vIyUmtIxRkYrkvXDM-Z9dv542SQN_Z5JoKORlzvZF0mC0hNc/pub?output=csv',
+  ads: 'PLACEHOLDER_ADS_URL', // substituir pela URL da aba ads_germania (mesmo arquivo, gid diferente)
+};
+
+/* ─── Estado global ─── */
+let rawCRM = [];
+let rawADS = [];
+let fetchErrors = [];
+
+/* ══════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════ */
+
+function parseCSV(txt, delim) {
+  const lines = txt.replace(/\r/g, '').split('\n').filter(l => l.trim());
+  if (!lines.length) return [];
+  let start = 0;
+  if (lines[0].toLowerCase().startsWith('sep=')) start = 1;
+  const firstLine = lines[start].replace(/^﻿/, '');
+  const d = delim || (firstLine.indexOf(';') > -1 ? ';' : ',');
+  const hdr = splitLine(firstLine, d).map(h => h.trim().replace(/^"|"$/g, ''));
+  return lines.slice(start + 1).map(line => {
+    const vals = splitLine(line, d);
+    const obj = {};
+    hdr.forEach((h, i) => { obj[h] = (vals[i] || '').trim().replace(/^"|"$/g, ''); });
+    return obj;
+  }).filter(r => Object.values(r).some(v => v !== ''));
+}
+
+function splitLine(line, delim) {
+  const parts = [];
+  let cur = '';
+  let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === delim && !inQ) { parts.push(cur); cur = ''; }
+    else { cur += c; }
+  }
+  parts.push(cur);
+  return parts;
+}
+
+function parseDate(str) {
+  if (!str) return null;
+  const s = str.trim();
+  // DD/MM/YYYY or DD/MM/YYYY HH:MM
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) return new Date(+m[3], +m[2] - 1, +m[1]);
+  // ISO
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+
+const HOJE = new Date();
+HOJE.setHours(0, 0, 0, 0);
+
+function diasNoPipeline(dataCriacao) {
+  const d = parseDate(dataCriacao);
+  if (!d) return 0;
+  return Math.max(0, Math.floor((HOJE - d) / 86400000));
+}
+
+function classeDias(dias) {
+  if (dias < 15)  return 'dias-ok';
+  if (dias <= 30) return 'dias-warn';
+  return 'dias-crit';
+}
+
+function isSDR(resp) {
+  const r = (resp || '').toLowerCase().trim();
+  return r === 'mirian' || r === 'gabriel costa';
+}
+
+function isExpansao(resp) {
+  const r = (resp || '').toLowerCase().trim();
+  return r === 'joaquim octavio' || r === 'antonio troleis';
+}
+
+function fmtBRL(v) {
+  if (isNaN(v) || v === null) return '--';
+  return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+function fmtBRL2(v) {
+  if (isNaN(v) || v === null) return '--';
+  return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtPct(v) {
+  if (isNaN(v)) return '--';
+  return Number(v).toFixed(1).replace('.', ',') + '%';
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const ETAPAS_FUNIL = [
+  'Interesse Inicial',
+  'Coleta de Dados',
+  'Encaminhamento para Expansão',
+  'Contato Comercial',
+  'Apresentação do Projeto de Viabilidade',
+  'Assinatura do Contrato da Franquia',
+];
+
+const ETAPAS_SDR = ['Interesse Inicial', 'Coleta de Dados', 'Encaminhamento para Expansão'];
+const ETAPAS_EXP = ['Contato Comercial', 'Apresentação do Projeto de Viabilidade', 'Assinatura do Contrato da Franquia'];
+
+/* ══════════════════════════════════════════════
+   FETCH
+══════════════════════════════════════════════ */
+
+async function fetchAll() {
+  fetchErrors = [];
+  showLoading(true);
+  hideError();
+
+  const fetchOne = async (url, type) => {
+    if (!url || url.startsWith('PLACEHOLDER')) {
+      fetchErrors.push(`${type.toUpperCase()}: URL não configurada`);
+      return;
+    }
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const txt = await res.text();
+    const delim = type === 'crm' ? ';' : ',';
+    const data = parseCSV(txt, delim);
+    if (type === 'crm') rawCRM = data;
+    else rawADS = data;
+  };
+
+  const results = await Promise.allSettled([
+    fetchOne(URLS.crm, 'crm'),
+    fetchOne(URLS.ads, 'ads'),
+  ]);
+
+  results.forEach((r, i) => {
+    if (r.status === 'rejected') {
+      fetchErrors.push(`${['CRM','ADS'][i]}: ${r.reason.message}`);
+    }
+  });
+
+  showLoading(false);
+
+  if (fetchErrors.length === 2) {
+    showError(fetchErrors.join('<br>'));
+    return;
+  }
+
+  updateLastUpdated();
+  renderAll();
+}
+
+function showLoading(v) {
+  document.getElementById('loading-overlay').classList.toggle('visible', v);
+}
+
+function showError(msg) {
+  document.getElementById('error-detail').innerHTML = msg;
+  document.getElementById('error-overlay').classList.add('visible');
+}
+
+function hideError() {
+  document.getElementById('error-overlay').classList.remove('visible');
+}
+
+function updateLastUpdated() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('last-updated').textContent = 'Atualizado ' + t;
+}
+
+/* ══════════════════════════════════════════════
+   TAB SWITCHING
+══════════════════════════════════════════════ */
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+  renderActive();
+}
+
+/* ══════════════════════════════════════════════
+   DARK MODE
+══════════════════════════════════════════════ */
+
+function toggleDark() {
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('germania-dark-expansao', next);
+  document.getElementById('dark-lbl').textContent = next === 'dark' ? 'Claro' : 'Escuro';
+}
+
+/* ══════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════ */
+
+function renderAll() {
+  renderHeader();
+  renderActive();
+}
+
+function renderActive() {
+  const panel = document.querySelector('.tab-panel.active');
+  if (!panel) return;
+  const id = panel.id;
+  if (id === 'panel-visao')    renderVisaoGeral();
+  if (id === 'panel-sdr')      renderSDR();
+  if (id === 'panel-expansao') renderExpansao();
+  if (id === 'panel-ads')      renderADS();
+}
+
+/* ── Header KPIs ── */
+function renderHeader() {
+  const total = rawCRM.length;
+  const ativos = rawCRM.filter(r => (r['Estado'] || r['Estado '] || '').trim() === 'Em Andamento').length;
+  const assin = rawCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato da Franquia').length;
+  document.getElementById('hk-total').textContent = total || '--';
+  document.getElementById('hk-ativos').textContent = ativos || '--';
+  document.getElementById('hk-assinaturas').textContent = assin || '--';
+}
+
+/* ── helpers de campo ── */
+function getField(row, ...candidates) {
+  for (const c of candidates) {
+    if (row[c] !== undefined && row[c] !== '') return (row[c] || '').trim();
+  }
+  return '';
+}
+
+function normalizeEtapa(row) {
+  return getField(row, 'Etapa', 'etapa', 'ETAPA').trim();
+}
+
+function normalizeEstado(row) {
+  return getField(row, 'Estado', 'Estado ', 'ESTADO').trim();
+}
+
+function normalizeResp(row) {
+  return getField(row, 'Responsável', 'Responsavel', 'responsavel').trim();
+}
+
+function normalizeMotivo(row) {
+  return getField(row, 'Motivo de Perda', 'Motivo de perda', 'motivo de perda').trim();
+}
+
+function normalizeFonte(row) {
+  return getField(row, 'Fonte', 'fonte').trim();
+}
+
+function normalizeDataCriacao(row) {
+  return getField(row, 'Data de criação', 'Data de criacao', 'data de criação').trim();
+}
+
+/* ══════════════════════════════════════════════
+   TAB 1: VISÃO GERAL
+══════════════════════════════════════════════ */
+
+function renderVisaoGeral() {
+  const total = rawCRM.length;
+  const ativos = rawCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
+  const perdidos = rawCRM.filter(r => normalizeEstado(r) === 'Perdida').length;
+
+  /* CPL: investimento ADS total / total leads */
+  const adsValorCol = rawADS.length
+    ? Object.keys(rawADS[0]).find(h => h.toLowerCase().includes('valor usado') || h.toLowerCase().includes('valor'))
+    : null;
+  const investTotal = rawADS.reduce((s, r) => {
+    const v = parseFloat((adsValorCol ? r[adsValorCol] : 0) || 0);
+    return s + (isNaN(v) ? 0 : v / 100);
+  }, 0);
+  const cpl = total > 0 ? investTotal / total : 0;
+
+  document.getElementById('vg-total').textContent    = total;
+  document.getElementById('vg-ativos').textContent   = ativos;
+  document.getElementById('vg-perdidos').textContent = perdidos;
+  document.getElementById('vg-cpl').textContent      = investTotal > 0 ? fmtBRL2(cpl) : '--';
+
+  renderFunil();
+  renderTimeline('timeline-container', rawCRM);
+}
+
+function renderFunil() {
+  const counts = {};
+  ETAPAS_FUNIL.forEach(e => { counts[e] = 0; });
+  rawCRM.forEach(r => {
+    const e = normalizeEtapa(r);
+    if (counts[e] !== undefined) counts[e]++;
+  });
+
+  const max = Math.max(...Object.values(counts), 1);
+  const colors = [
+    '#C92B1E', '#CC3D22', '#CE5028',
+    '#C87A1A', '#C88E1A', '#C8941A',
+  ];
+
+  const html = ETAPAS_FUNIL.map((etapa, i) => {
+    const count = counts[etapa];
+    const pct = Math.max(8, Math.round((count / max) * 100));
+    return `
+      <div class="funil-item">
+        <div class="funil-label">${esc(etapa)}</div>
+        <div class="funil-bar-wrap">
+          <div class="funil-bar" style="width:${pct}%;background:${colors[i]}">
+            <span class="funil-count">${count}</span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('funil-container').innerHTML = html;
+}
+
+/* ══════════════════════════════════════════════
+   GRÁFICO SEMANAL (SVG barras)
+══════════════════════════════════════════════ */
+
+function getWeekKey(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  return d.toISOString().slice(0, 10);
+}
+
+function renderTimeline(containerId, rows) {
+  const weeks = {};
+  rows.forEach(r => {
+    const d = parseDate(normalizeDataCriacao(r));
+    if (!d) return;
+    const wk = getWeekKey(d);
+    weeks[wk] = (weeks[wk] || 0) + 1;
+  });
+
+  const sorted = Object.entries(weeks).sort((a, b) => a[0].localeCompare(b[0]));
+  if (!sorted.length) {
+    document.getElementById(containerId).innerHTML = '<div class="empty-state">Sem dados de data.</div>';
+    return;
+  }
+
+  const maxVal = Math.max(...sorted.map(([, v]) => v), 1);
+  const barW = 36, gap = 8;
+  const chartH = 140, labelH = 28;
+  const totalW = sorted.length * (barW + gap);
+  const svgH = chartH + labelH;
+
+  const bars = sorted.map(([wk, v], i) => {
+    const x = i * (barW + gap);
+    const bh = Math.max(4, Math.round((v / maxVal) * chartH));
+    const by = chartH - bh;
+    const label = wk.slice(5); // MM-DD
+    return `
+      <rect x="${x}" y="${by}" width="${barW}" height="${bh}" rx="3" fill="#C92B1E" opacity="0.8"/>
+      <text x="${x + barW / 2}" y="${by - 4}" text-anchor="middle"
+        font-family="Barlow Condensed,sans-serif" font-size="11" fill="var(--txt-faint)">${v}</text>
+      <text x="${x + barW / 2}" y="${svgH - 6}" text-anchor="middle"
+        font-family="Barlow Condensed,sans-serif" font-size="10" fill="var(--txt-faint)">${label}</text>`;
+  }).join('');
+
+  document.getElementById(containerId).innerHTML = `
+    <div class="bar-chart-wrap">
+      <svg width="${Math.max(totalW, 400)}" height="${svgH}" style="overflow:visible">
+        ${bars}
+      </svg>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════
+   TAB 2: SDR
+══════════════════════════════════════════════ */
+
+function renderSDR() {
+  const sdrRows = rawCRM.filter(r => isSDR(normalizeResp(r)));
+  const qualif  = sdrRows.filter(r => normalizeEtapa(r) === 'Encaminhamento para Expansão').length;
+  const taxa    = sdrRows.length > 0 ? (qualif / sdrRows.length) * 100 : 0;
+
+  document.getElementById('sdr-total').textContent  = sdrRows.length || '--';
+  document.getElementById('sdr-qualif').textContent = qualif || '--';
+  document.getElementById('sdr-taxa').textContent   = fmtPct(taxa);
+
+  /* Motivos de perda SDR */
+  const perdaSDR = sdrRows.filter(r => normalizeEstado(r) === 'Perdida');
+  renderMotivoPerda('sdr-perda-container', perdaSDR);
+
+  /* Pipeline ativo SDR */
+  renderPipelineAtivo('sdr-pipeline-container', sdrRows, ETAPAS_SDR);
+
+  /* Ritmo semanal */
+  renderTimeline('sdr-semanal-container', sdrRows);
+}
+
+function renderMotivoPerda(containerId, rows) {
+  if (!rows.length) {
+    document.getElementById(containerId).innerHTML = '<div class="empty-state">Nenhuma perda registrada.</div>';
+    return;
+  }
+  const counts = {};
+  rows.forEach(r => {
+    const m = normalizeMotivo(r) || 'Sem motivo';
+    counts[m] = (counts[m] || 0) + 1;
+  });
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const total = rows.length;
+
+  const rows_html = sorted.map(([motivo, count]) => {
+    const pct = ((count / total) * 100).toFixed(1);
+    const isOutros = motivo.toLowerCase() === 'outros' || motivo === 'Nada' || motivo.toLowerCase() === 'nada';
+    const cls = isOutros ? 'highlight-red' : '';
+    return `<tr class="${cls}">
+      <td>${esc(motivo)}</td>
+      <td class="right">${count}</td>
+      <td class="right">${pct}%</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById(containerId).innerHTML = `
+    <table class="ez-table">
+      <thead><tr>
+        <th>Motivo</th>
+        <th class="right">Count</th>
+        <th class="right">%</th>
+      </tr></thead>
+      <tbody>${rows_html}</tbody>
+    </table>`;
+}
+
+function renderPipelineAtivo(containerId, allRows, etapas) {
+  const ativos = allRows.filter(r => normalizeEstado(r) === 'Em Andamento');
+  const counts = {};
+  etapas.forEach(e => { counts[e] = 0; });
+  ativos.forEach(r => {
+    const e = normalizeEtapa(r);
+    if (counts[e] !== undefined) counts[e]++;
+  });
+
+  const rows_html = etapas.map(e => `
+    <tr>
+      <td>${esc(e)}</td>
+      <td class="right"><strong>${counts[e]}</strong></td>
+    </tr>`).join('');
+
+  document.getElementById(containerId).innerHTML = `
+    <table class="ez-table">
+      <thead><tr>
+        <th>Etapa</th>
+        <th class="right">Leads Ativos</th>
+      </tr></thead>
+      <tbody>${rows_html}</tbody>
+    </table>`;
+}
+
+/* ══════════════════════════════════════════════
+   TAB 3: TIME EXPANSÃO
+══════════════════════════════════════════════ */
+
+function renderExpansao() {
+  const expRows = rawCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
+  const ativos  = expRows.filter(r => normalizeEstado(r) === 'Em Andamento');
+  const assin   = expRows.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato da Franquia').length;
+
+  /* Média de dias por etapa */
+  const cc = ativos.filter(r => normalizeEtapa(r) === 'Contato Comercial');
+  const ap = ativos.filter(r => normalizeEtapa(r) === 'Apresentação do Projeto de Viabilidade');
+
+  const avg = arr => arr.length
+    ? Math.round(arr.reduce((s, r) => s + diasNoPipeline(normalizeDataCriacao(r)), 0) / arr.length)
+    : null;
+
+  document.getElementById('exp-total').textContent   = expRows.length || '--';
+  document.getElementById('exp-dias-cc').textContent = avg(cc) !== null ? avg(cc) + 'd' : '--';
+  document.getElementById('exp-dias-ap').textContent = avg(ap) !== null ? avg(ap) + 'd' : '--';
+  document.getElementById('exp-assin').textContent   = assin;
+
+  /* Alert box Outros */
+  const perdaExp = rawCRM.filter(r => normalizeEstado(r) === 'Perdida' && isExpansao(normalizeResp(r)));
+  const outros   = perdaExp.filter(r => {
+    const m = normalizeMotivo(r).toLowerCase();
+    return m === 'outros' || m === 'nada' || m === '';
+  });
+  const pctOutros = perdaExp.length > 0 ? ((outros.length / perdaExp.length) * 100).toFixed(0) : 0;
+  document.getElementById('exp-alert').innerHTML =
+    `<strong>⚠️ ${outros.length} leads perdidos sem motivo registrado (${pctOutros}%)</strong> — ` +
+    `o campo "Outros" domina as perdas na expansão. Análise de perda inviável sem melhoria na classificação.`;
+
+  /* Tabela ativos com dias parados */
+  const ativosEtapas = ativos.filter(r =>
+    ['Contato Comercial', 'Apresentação do Projeto de Viabilidade'].includes(normalizeEtapa(r))
+  ).map(r => ({
+    nome:  getField(r, 'Nome', 'nome') || 'Sem nome',
+    etapa: normalizeEtapa(r),
+    resp:  normalizeResp(r),
+    dias:  diasNoPipeline(normalizeDataCriacao(r)),
+  })).sort((a, b) => b.dias - a.dias);
+
+  if (ativosEtapas.length) {
+    const rows_html = ativosEtapas.map(item => `
+      <tr>
+        <td>${esc(item.nome)}</td>
+        <td>${esc(item.etapa)}</td>
+        <td>${esc(item.resp)}</td>
+        <td class="right"><span class="badge-dias ${classeDias(item.dias)}">${item.dias}d</span></td>
+      </tr>`).join('');
+    document.getElementById('exp-ativos-container').innerHTML = `
+      <table class="ez-table">
+        <thead><tr>
+          <th>Nome</th><th>Etapa</th><th>Responsável</th><th class="right">Dias</th>
+        </tr></thead>
+        <tbody>${rows_html}</tbody>
+      </table>`;
+  } else {
+    document.getElementById('exp-ativos-container').innerHTML =
+      '<div class="empty-state">Nenhum lead ativo nas etapas de expansão.</div>';
+  }
+
+  /* Por responsável */
+  renderResponsaveis('exp-resp-container', expRows);
+
+  /* Pipeline etapas */
+  renderPipelineAtivo('exp-pipeline-container', expRows, ETAPAS_EXP);
+
+  /* Motivos de perda expansão */
+  renderMotivoPerda('exp-perda-container', perdaExp);
+}
+
+function renderResponsaveis(containerId, rows) {
+  const map = {};
+  rows.forEach(r => {
+    const resp = normalizeResp(r) || 'Desconhecido';
+    if (!map[resp]) map[resp] = { total: 0, perdidos: 0 };
+    map[resp].total++;
+    if (normalizeEstado(r) === 'Perdida') map[resp].perdidos++;
+  });
+  const sorted = Object.entries(map).sort((a, b) => b[1].total - a[1].total);
+  const rows_html = sorted.map(([resp, d]) => `
+    <tr>
+      <td>${esc(resp)}</td>
+      <td class="right">${d.total}</td>
+      <td class="right">${d.perdidos}</td>
+    </tr>`).join('');
+  document.getElementById(containerId).innerHTML = `
+    <table class="ez-table">
+      <thead><tr>
+        <th>Responsável</th><th class="right">Total</th><th class="right">Perdidos</th>
+      </tr></thead>
+      <tbody>${rows_html}</tbody>
+    </table>`;
+}
+
+/* ══════════════════════════════════════════════
+   TAB 4: ADS
+══════════════════════════════════════════════ */
+
+function getAdsField(row, idx) {
+  const keys = Object.keys(row);
+  return (keys[idx] !== undefined ? row[keys[idx]] : '') || '';
+}
+
+function renderADS() {
+  if (!rawADS.length) {
+    ['ads-invest','ads-cpl','ads-leads','ads-ativas'].forEach(id => {
+      document.getElementById(id).textContent = '--';
+    });
+    document.getElementById('ads-campanhas-container').innerHTML =
+      '<div class="empty-state">Sem dados de ADS. Verifique a URL.</div>';
+    document.getElementById('ads-cpl-chart').innerHTML = '';
+    document.getElementById('ads-fontes-container').innerHTML = '';
+    return;
+  }
+
+  /* Identificar colunas por header */
+  const firstRow = rawADS[0];
+  const headers  = Object.keys(firstRow);
+
+  /* Tentar mapear por header name (posição pode variar) */
+  const findCol = (...names) => {
+    for (const name of names) {
+      const idx = headers.findIndex(h => h.toLowerCase().trim().includes(name.toLowerCase()));
+      if (idx > -1) return headers[idx];
+    }
+    return null;
+  };
+
+  const colNome    = findCol('nome da campanha', 'campanha');
+  const colVeic    = findCol('veiculação', 'veiculacao', 'status');
+  const colLeads   = findCol('resultados', 'leads');
+  const colValor   = findCol('valor usado', 'valor');
+  const colAlcance = findCol('alcance');
+  const colCliques = findCol('cliques');
+  const colCTR     = findCol('ctr');
+
+  /* Agrupar por campanha */
+  const campanhas = {};
+  rawADS.forEach(r => {
+    const nome = colNome ? (r[colNome] || '').trim() : 'Desconhecida';
+    if (!nome) return;
+    if (!campanhas[nome]) {
+      campanhas[nome] = { leads: 0, valor: 0, alcance: 0, cliques: 0, ativa: false };
+    }
+    const leads  = parseFloat((colLeads  ? r[colLeads]  : 0) || 0);
+    const valor  = parseFloat((colValor  ? r[colValor]  : 0) || 0);
+    const alc    = parseFloat((colAlcance? r[colAlcance]: 0) || 0);
+    const cli    = parseFloat((colCliques? r[colCliques]: 0) || 0);
+    const veic   = (colVeic ? r[colVeic] : '').toLowerCase().trim();
+    campanhas[nome].leads   += isNaN(leads) ? 0 : leads;
+    campanhas[nome].valor   += isNaN(valor) ? 0 : valor / 100;
+    campanhas[nome].alcance += isNaN(alc)   ? 0 : alc;
+    campanhas[nome].cliques += isNaN(cli)   ? 0 : cli;
+    if (veic === 'active') campanhas[nome].ativa = true;
+  });
+
+  const list = Object.entries(campanhas).sort((a, b) => b[1].valor - a[1].valor);
+  const totalInvest = list.reduce((s, [, d]) => s + d.valor, 0);
+  const totalLeads  = list.reduce((s, [, d]) => s + d.leads, 0);
+  const ativas      = list.filter(([, d]) => d.ativa).length;
+  const cplGeral    = totalLeads > 0 ? totalInvest / totalLeads : 0;
+
+  document.getElementById('ads-invest').textContent = fmtBRL(totalInvest);
+  document.getElementById('ads-cpl').textContent    = totalLeads > 0 ? fmtBRL2(cplGeral) : '--';
+  document.getElementById('ads-leads').textContent  = totalLeads;
+  document.getElementById('ads-ativas').textContent = ativas;
+
+  /* Tabela campanhas */
+  const tRows = list.map(([nome, d]) => {
+    const cpl  = d.leads > 0 ? fmtBRL2(d.valor / d.leads) : '--';
+    const label = nome.length > 40 ? nome.slice(0, 40) + '…' : nome;
+    const status = d.ativa
+      ? '<span class="chip chip-active">Ativa</span>'
+      : '<span class="chip chip-paused">Encerrada</span>';
+    return `<tr>
+      <td title="${esc(nome)}">${esc(label)}</td>
+      <td class="right">${Math.round(d.leads)}</td>
+      <td class="right">${fmtBRL(d.valor)}</td>
+      <td class="right">${cpl}</td>
+      <td>${status}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('ads-campanhas-container').innerHTML = `
+    <table class="ez-table">
+      <thead><tr>
+        <th>Campanha</th>
+        <th class="right">Leads</th>
+        <th class="right">Investimento</th>
+        <th class="right">CPL</th>
+        <th>Status</th>
+      </tr></thead>
+      <tbody>${tRows}</tbody>
+    </table>`;
+
+  /* Gráfico CPL por campanha */
+  renderCplChart(list);
+
+  /* Leads por fonte (CRM) */
+  renderFontesCRM();
+}
+
+function renderCplChart(list) {
+  const data = list
+    .filter(([, d]) => d.leads > 0)
+    .map(([nome, d]) => ({ nome: nome.length > 30 ? nome.slice(0, 30) + '…' : nome, cpl: d.valor / d.leads }))
+    .slice(0, 10);
+
+  if (!data.length) {
+    document.getElementById('ads-cpl-chart').innerHTML = '<div class="empty-state">Sem dados.</div>';
+    return;
+  }
+
+  const maxCpl = Math.max(...data.map(d => d.cpl), 1);
+  const barH = 24, gap = 8;
+  const svgH = data.length * (barH + gap);
+  const labelW = 180, barMaxW = 200, valW = 60;
+  const totalW = labelW + barMaxW + valW + 20;
+
+  const bars = data.map((item, i) => {
+    const y   = i * (barH + gap);
+    const bw  = Math.max(4, Math.round((item.cpl / maxCpl) * barMaxW));
+    return `
+      <text x="${labelW - 6}" y="${y + barH / 2 + 4}" text-anchor="end"
+        font-family="Barlow Condensed,sans-serif" font-size="11" fill="var(--txt-faint)">${esc(item.nome)}</text>
+      <rect x="${labelW}" y="${y}" width="${bw}" height="${barH}" rx="3" fill="#C8941A" opacity="0.85"/>
+      <text x="${labelW + bw + 6}" y="${y + barH / 2 + 4}"
+        font-family="Barlow Condensed,sans-serif" font-size="12" font-weight="700" fill="var(--gold)">${fmtBRL2(item.cpl)}</text>`;
+  }).join('');
+
+  document.getElementById('ads-cpl-chart').innerHTML = `
+    <div class="bar-chart-wrap">
+      <svg width="${totalW}" height="${svgH + 10}" style="overflow:visible">${bars}</svg>
+    </div>`;
+}
+
+function renderFontesCRM() {
+  const counts = {};
+  rawCRM.forEach(r => {
+    const f = normalizeFonte(r) || 'Desconhecida';
+    counts[f] = (counts[f] || 0) + 1;
+  });
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+  const rows_html = sorted.map(([fonte, count]) => `
+    <tr>
+      <td>${esc(fonte)}</td>
+      <td class="right">${count}</td>
+    </tr>`).join('');
+
+  document.getElementById('ads-fontes-container').innerHTML = `
+    <table class="ez-table">
+      <thead><tr>
+        <th>Fonte</th><th class="right">Leads</th>
+      </tr></thead>
+      <tbody>${rows_html}</tbody>
+    </table>`;
+}
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+
+(function init() {
+  /* Restaurar tema */
+  const theme = localStorage.getItem('germania-dark-expansao') || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('dark-lbl').textContent = theme === 'dark' ? 'Claro' : 'Escuro';
+
+  /* Carregar dados */
+  fetchAll();
+
+  /* Auto-refresh a cada 10 minutos */
+  setInterval(fetchAll, 10 * 60 * 1000);
+})();
+</script>
+</body>
+</html>

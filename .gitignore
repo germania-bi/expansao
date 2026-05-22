@@ -1,0 +1,4 @@
+.claude/
+*.csv
+dashboard_expansao_SPEC.md
+PROMPT_ABERTURA_CLAUDE_CODE.md
