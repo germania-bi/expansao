@@ -1521,38 +1521,65 @@ function renderTimeline(containerId, rows) {
     return;
   }
 
-  const maxVal = Math.max(...sorted.map(([, v]) => v), 1);
   const n = sorted.length;
-  const chartH = 150, labelH = 30;
-  const svgH = chartH + labelH;
-  const gap = 6;
+  const maxVal = Math.max(...sorted.map(([, v]) => v), 1);
 
-  /* barW dinâmico: preenche o container, min 24px max 64px */
-  const containerEl = document.getElementById(containerId);
-  const containerW = (containerEl && containerEl.offsetWidth > 100) ? containerEl.offsetWidth - 4 : 700;
-  const barW = Math.min(64, Math.max(24, Math.floor((containerW - gap * (n - 1)) / n)));
-  const totalW = n * barW + (n - 1) * gap;
+  /* dimensões — padding generoso no topo para labels não saírem dos bounds */
+  const el = document.getElementById(containerId);
+  const W  = (el && el.offsetWidth > 100) ? el.offsetWidth : 700;
+  const H  = 170;
+  const pL = 10, pR = 10, pT = 30, pB = 26;
+  const plotW = W - pL - pR;
+  const plotH = H - pT - pB;
 
-  const bars = sorted.map(([wk, v], i) => {
-    const x  = i * (barW + gap);
-    const bh = Math.max(4, Math.round((v / maxVal) * chartH));
-    const by = chartH - bh;
-    const label = wk.slice(5); // MM-DD
-    const fontSize = barW < 32 ? 9 : 11;
-    return `
-      <rect x="${x}" y="${by}" width="${barW}" height="${bh}" rx="3" fill="#C92B1E" opacity="0.85"/>
-      <text x="${x + barW / 2}" y="${by - 5}" text-anchor="middle"
-        font-family="Barlow Condensed,sans-serif" font-size="${fontSize}" fill="var(--txt-faint)">${v}</text>
-      <text x="${x + barW / 2}" y="${svgH - 4}" text-anchor="middle"
-        font-family="Barlow Condensed,sans-serif" font-size="${fontSize}" fill="var(--txt-faint)">${label}</text>`;
+  const pts = sorted.map(([wk, v], i) => ({
+    x: pL + (n > 1 ? (i / (n - 1)) * plotW : plotW / 2),
+    y: pT + (1 - v / maxVal) * plotH,
+    v, label: wk.slice(5),
+  }));
+
+  const lineD = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+  const areaD = lineD
+    + ` L${pts[pts.length - 1].x.toFixed(1)} ${(pT + plotH).toFixed(1)}`
+    + ` L${pts[0].x.toFixed(1)} ${(pT + plotH).toFixed(1)} Z`;
+
+  /* labels do eixo X — rarefia se muitas semanas */
+  const step = Math.max(1, Math.ceil(n / 12));
+  const xLabels = pts
+    .filter((_, i) => i % step === 0 || i === n - 1)
+    .map(p => `<text x="${p.x.toFixed(1)}" y="${H - 6}" text-anchor="middle"
+      font-family="Barlow Condensed,sans-serif" font-size="10" fill="var(--txt-faint)">${p.label}</text>`)
+    .join('');
+
+  /* labels de valor — apenas primeiro, máximo e último */
+  const maxIdx = pts.reduce((best, p, i) => p.v > pts[best].v ? i : best, 0);
+  const labelIdxs = [...new Set([0, maxIdx, n - 1])];
+  const valueLabels = labelIdxs.map(i => {
+    const p = pts[i];
+    return `<text x="${p.x.toFixed(1)}" y="${(p.y - 9).toFixed(1)}" text-anchor="middle"
+      font-family="Barlow Condensed,sans-serif" font-size="11" font-weight="700" fill="var(--txt)">${p.v}</text>`;
+  }).join('');
+
+  const dots = pts.map((p, i) => {
+    const big = labelIdxs.includes(i);
+    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${big ? 4 : 2.5}" fill="#C92B1E" opacity="${big ? '1' : '0.7'}"/>`;
   }).join('');
 
   document.getElementById(containerId).innerHTML = `
-    <div class="bar-chart-wrap">
-      <svg width="${totalW}" height="${svgH}" style="overflow:visible;display:block">
-        ${bars}
-      </svg>
-    </div>`;
+    <svg width="${W}" height="${H}" style="display:block;overflow:visible">
+      <defs>
+        <linearGradient id="agrad-${containerId}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#C92B1E" stop-opacity="0.28"/>
+          <stop offset="100%" stop-color="#C92B1E" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>
+      <path d="${areaD}" fill="url(#agrad-${containerId})"/>
+      <path d="${lineD}" fill="none" stroke="#C92B1E" stroke-width="2"
+        stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}
+      ${valueLabels}
+      ${xLabels}
+    </svg>`;
 }
 
 /* ══════════════════════════════════════════════
