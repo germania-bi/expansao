@@ -1034,8 +1034,13 @@ const ETAPAS_FUNIL = [
   'Assinatura do Contrato da Franquia',
 ];
 
-const ETAPAS_SDR = ['Interesse Inicial', 'Coleta de Dados', 'Encaminhamento para Expansão'];
-const ETAPAS_EXP = ['Contato Comercial', 'Apresentação do Projeto de Viabilidade', 'Assinatura do Contrato da Franquia'];
+const ETAPAS_SDR = ['Interesse Inicial', 'Coleta de Dados'];
+const ETAPAS_EXP = [
+  'Encaminhamento para Expansão',
+  'Contato Comercial',
+  'Apresentação do Projeto de Viabilidade',
+  'Assinatura do Contrato da Franquia',
+];
 
 /* ══════════════════════════════════════════════
    FETCH
@@ -1305,23 +1310,31 @@ function renderTimeline(containerId, rows) {
 ══════════════════════════════════════════════ */
 
 function renderSDR() {
-  const sdrRows = rawCRM.filter(r => isSDR(normalizeResp(r)));
-  const qualif  = sdrRows.filter(r => normalizeEtapa(r) === 'Encaminhamento para Expansão').length;
-  const taxa    = sdrRows.length > 0 ? (qualif / sdrRows.length) * 100 : 0;
+  // Todos os leads passam pelo SDR — etapas 1-2 são território SDR
+  const total  = rawCRM.length;
+  // Qualificados = chegaram à etapa 3+ (encaminhados para expansão)
+  const qualif = rawCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r))).length;
+  const taxa   = total > 0 ? (qualif / total) * 100 : 0;
 
-  document.getElementById('sdr-total').textContent  = sdrRows.length || '--';
+  document.getElementById('sdr-total').textContent  = total || '--';
   document.getElementById('sdr-qualif').textContent = qualif || '--';
   document.getElementById('sdr-taxa').textContent   = fmtPct(taxa);
 
-  /* Motivos de perda SDR */
-  const perdaSDR = sdrRows.filter(r => normalizeEstado(r) === 'Perdida');
+  /* Perdas SDR = perdidos enquanto em etapas 1-2 */
+  const perdaSDR = rawCRM.filter(r =>
+    normalizeEstado(r) === 'Perdida' && ETAPAS_SDR.includes(normalizeEtapa(r))
+  );
   renderMotivoPerda('sdr-perda-container', perdaSDR);
 
-  /* Pipeline ativo SDR */
-  renderPipelineAtivo('sdr-pipeline-container', sdrRows, ETAPAS_SDR);
+  /* Pipeline ativo SDR = em andamento nas etapas 1-2 */
+  renderPipelineAtivo(
+    'sdr-pipeline-container',
+    rawCRM.filter(r => ETAPAS_SDR.includes(normalizeEtapa(r))),
+    ETAPAS_SDR
+  );
 
-  /* Ritmo semanal */
-  renderTimeline('sdr-semanal-container', sdrRows);
+  /* Ritmo semanal = todos os leads (todos entram pelo SDR) */
+  renderTimeline('sdr-semanal-container', rawCRM);
 }
 
 function renderMotivoPerda(containerId, rows) {
@@ -1407,7 +1420,9 @@ function renderExpansao() {
   document.getElementById('exp-assin').textContent   = assin;
 
   /* Alert box Outros */
-  const perdaExp = rawCRM.filter(r => normalizeEstado(r) === 'Perdida' && isExpansao(normalizeResp(r)));
+  const perdaExp = rawCRM.filter(r =>
+    normalizeEstado(r) === 'Perdida' && ETAPAS_EXP.includes(normalizeEtapa(r))
+  );
   const outros   = perdaExp.filter(r => {
     const m = normalizeMotivo(r).toLowerCase();
     return m === 'outros' || m === 'nada' || m === '';
