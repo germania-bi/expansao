@@ -733,13 +733,12 @@ body { background: var(--bg); color: var(--txt); }
 <div class="filters-wrap">
   <div class="filters-inner">
     <span class="f-label">Período</span>
-    <button class="f-chip active" id="fc-tudo"  onclick="setFiltro('tudo',this)">Tudo</button>
-    <button class="f-chip"        id="fc-7d"    onclick="setFiltro('7d',this)">7d</button>
-    <button class="f-chip"        id="fc-30d"   onclick="setFiltro('30d',this)">30d</button>
-    <button class="f-chip"        id="fc-tri"   onclick="setFiltro('tri',this)">Tri</button>
-    <button class="f-chip"        id="fc-livre" onclick="setFiltro('livre',this)">Livre</button>
+    <button class="f-chip active" id="fc-tudo" onclick="setFiltro('tudo',this)">Tudo</button>
+    <button class="f-chip"        id="fc-7d"   onclick="setFiltro('7d',this)">7d</button>
+    <button class="f-chip"        id="fc-mes"  onclick="setFiltro('mes',this)">Mês</button>
+    <button class="f-chip"        id="fc-tri"  onclick="setFiltro('tri',this)">Tri</button>
     <div class="f-sep"></div>
-    <div class="f-date-wrap hidden" id="date-range">
+    <div class="f-date-wrap" id="date-range">
       <span class="f-date-lbl">De</span>
       <input type="date" class="f-date" id="f-de"  onchange="applyLivre()">
       <span class="f-range-sep">→</span>
@@ -1053,17 +1052,47 @@ let fetchErrors = [];
 let filtroAtivo = 'tudo';
 let filtroDe    = null;
 let filtroAte   = null;
-let activeCRM   = []; // rawCRM após aplicar filtro
+let activeCRM   = [];
+let activeADS   = [];
 
 function computeFilteredCRM() {
-  if (filtroAtivo === 'tudo' || (!filtroDe && !filtroAte)) return rawCRM;
+  if (!filtroDe && !filtroAte) return rawCRM;
   return rawCRM.filter(r => {
     const d = parseDate(normalizeDataCriacao(r));
-    if (!d) return true; // sem data → inclui
+    if (!d) return true;
     if (filtroDe && d < filtroDe) return false;
     if (filtroAte && d > filtroAte) return false;
     return true;
   });
+}
+
+function computeFilteredADS() {
+  if (!filtroDe && !filtroAte) return rawADS;
+  if (!rawADS.length) return rawADS;
+  const headers = Object.keys(rawADS[0]);
+  const dateCol = headers.find(h =>
+    h.toLowerCase().includes('início') || h.toLowerCase().includes('inicio') || h.toLowerCase().includes('início dos')
+  ) || headers[0];
+  return rawADS.filter(r => {
+    const d = parseDate(r[dateCol]);
+    if (!d) return true;
+    if (filtroDe && d < filtroDe) return false;
+    if (filtroAte && d > filtroAte) return false;
+    return true;
+  });
+}
+
+function toDateInput(d) {
+  if (!d) return '';
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${dd}`;
+}
+
+function setDateInputs(de, ate) {
+  document.getElementById('f-de').value  = toDateInput(de);
+  document.getElementById('f-ate').value = toDateInput(ate);
 }
 
 function setFiltro(tipo, el) {
@@ -1072,48 +1101,44 @@ function setFiltro(tipo, el) {
   el.classList.add('active');
 
   const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const dateRange = document.getElementById('date-range');
-  const tag = document.getElementById('periodo-tag');
+  const tag  = document.getElementById('periodo-tag');
 
   if (tipo === 'tudo') {
     filtroDe = null; filtroAte = null;
-    dateRange.classList.add('hidden');
+    setDateInputs(null, null);
     tag.classList.add('hidden');
 
   } else if (tipo === '7d') {
     filtroDe = new Date(hoje); filtroDe.setDate(hoje.getDate() - 6);
     filtroAte = new Date(hoje); filtroAte.setHours(23,59,59,999);
-    dateRange.classList.add('hidden');
+    setDateInputs(filtroDe, filtroAte);
     tag.textContent = fmtTagPeriodo(filtroDe, filtroAte);
     tag.classList.remove('hidden');
 
-  } else if (tipo === '30d') {
-    filtroDe = new Date(hoje); filtroDe.setDate(hoje.getDate() - 29);
+  } else if (tipo === 'mes') {
+    filtroDe  = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
     filtroAte = new Date(hoje); filtroAte.setHours(23,59,59,999);
-    dateRange.classList.add('hidden');
-    tag.textContent = fmtTagPeriodo(filtroDe, filtroAte);
+    setDateInputs(filtroDe, filtroAte);
+    tag.textContent = hoje.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
     tag.classList.remove('hidden');
 
   } else if (tipo === 'tri') {
     const m = hoje.getMonth();
     const qStart = Math.floor(m / 3) * 3;
-    filtroDe = new Date(hoje.getFullYear(), qStart, 1);
+    filtroDe  = new Date(hoje.getFullYear(), qStart, 1);
     filtroAte = new Date(hoje.getFullYear(), qStart + 3, 0, 23, 59, 59, 999);
-    dateRange.classList.add('hidden');
-    tag.textContent = 'Q' + (Math.floor(m/3)+1) + ' · ' + hoje.getFullYear();
+    setDateInputs(filtroDe, filtroAte);
+    tag.textContent = 'Q' + (Math.floor(m / 3) + 1) + ' · ' + hoje.getFullYear();
     tag.classList.remove('hidden');
-
-  } else if (tipo === 'livre') {
-    dateRange.classList.remove('hidden');
-    tag.classList.add('hidden');
-    applyLivre();
-    return; // applyLivre chama applyFiltro
   }
 
   applyFiltro();
 }
 
 function applyLivre() {
+  // Edição manual dos inputs: desativa chips, aplica como "livre"
+  document.querySelectorAll('.f-chip').forEach(c => c.classList.remove('active'));
+  filtroAtivo = 'livre';
   const de  = document.getElementById('f-de').value;
   const ate = document.getElementById('f-ate').value;
   filtroDe  = de  ? new Date(de  + 'T00:00:00') : null;
@@ -1124,17 +1149,20 @@ function applyLivre() {
     tag.classList.remove('hidden');
   } else {
     tag.classList.add('hidden');
+    filtroAtivo = 'tudo';
+    document.getElementById('fc-tudo').classList.add('active');
   }
   applyFiltro();
 }
 
 function applyFiltro() {
   activeCRM = computeFilteredCRM();
+  activeADS = computeFilteredADS();
   renderAll();
 }
 
 function fmtTagPeriodo(de, ate) {
-  const fmt = d => d ? d.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' }) : '?';
+  const fmt = d => d ? d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }) : '?';
   return fmt(de) + ' → ' + fmt(ate);
 }
 
@@ -1346,6 +1374,7 @@ function toggleDark() {
 
 function renderAll() {
   activeCRM = computeFilteredCRM();
+  activeADS = computeFilteredADS();
   renderHeader();
   renderActive();
 }
@@ -1411,11 +1440,11 @@ function renderVisaoGeral() {
   const ativos  = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
   const perdidos = activeCRM.filter(r => normalizeEstado(r) === 'Perdida').length;
 
-  /* CPL: investimento ADS total / total leads */
-  const adsValorCol = rawADS.length
-    ? Object.keys(rawADS[0]).find(h => h.toLowerCase().includes('valor usado') || h.toLowerCase().includes('valor'))
+  /* CPL: investimento ADS filtrado / total leads */
+  const adsValorCol = activeADS.length
+    ? Object.keys(activeADS[0]).find(h => h.toLowerCase().includes('valor usado') || h.toLowerCase().includes('valor'))
     : null;
-  const investTotal = rawADS.reduce((s, r) => {
+  const investTotal = activeADS.reduce((s, r) => {
     const v = parseFloat((adsValorCol ? r[adsValorCol] : 0) || 0);
     return s + (isNaN(v) ? 0 : v / 100);
   }, 0);
@@ -1723,9 +1752,10 @@ function renderADS() {
     return;
   }
 
-  /* Identificar colunas por header */
+  /* Usar dados filtrados — colunas detectadas pelo header bruto */
   const firstRow = rawADS[0];
   const headers  = Object.keys(firstRow);
+  const adsData  = activeADS.length ? activeADS : rawADS;
 
   /* Tentar mapear por header name (posição pode variar) */
   const findCol = (...names) => {
@@ -1744,9 +1774,9 @@ function renderADS() {
   const colCliques = findCol('cliques');
   const colCTR     = findCol('ctr');
 
-  /* Agrupar por campanha */
+  /* Agrupar por campanha (dados filtrados) */
   const campanhas = {};
-  rawADS.forEach(r => {
+  adsData.forEach(r => {
     const nome = colNome ? (r[colNome] || '').trim() : 'Desconhecida';
     if (!nome) return;
     if (!campanhas[nome]) {
