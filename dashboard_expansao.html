@@ -562,6 +562,104 @@ body { background: var(--bg); color: var(--txt); }
 .btn-reload:hover { background: #a82318; }
 
 /* ══════════════════════════════════════════════
+   FILTER BAR
+══════════════════════════════════════════════ */
+.filters-wrap {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+}
+.filters-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+}
+.f-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--txt-faint);
+  margin-right: 4px;
+  white-space: nowrap;
+}
+.f-chip {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--txt-faint);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.f-chip:hover:not(.active) {
+  color: var(--txt);
+  border-color: rgba(255,166,44,0.3);
+}
+.f-chip.active {
+  background: rgba(255,166,44,0.12);
+  color: var(--gold);
+  border-color: rgba(255,166,44,0.4);
+}
+.f-sep {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+.f-date-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.f-date-wrap.hidden { display: none; }
+.f-date-lbl {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  color: var(--txt-faint);
+}
+.f-date {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  background: var(--bg3);
+  color: var(--txt);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 3px 8px;
+  cursor: pointer;
+  width: 116px;
+}
+.f-date:focus { outline: none; border-color: rgba(255,166,44,0.4); }
+.f-range-sep {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  color: var(--txt-faint);
+}
+.f-periodo-tag {
+  margin-left: auto;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  color: var(--gold);
+  background: rgba(255,166,44,0.08);
+  border: 1px solid rgba(255,166,44,0.2);
+  border-radius: 4px;
+  padding: 2px 10px;
+  white-space: nowrap;
+}
+.f-periodo-tag.hidden { display: none; }
+
+/* ══════════════════════════════════════════════
    EMPTY STATE
 ══════════════════════════════════════════════ */
 .empty-state {
@@ -628,6 +726,29 @@ body { background: var(--bg); color: var(--txt); }
     <div class="tab"         onclick="switchTab('ads',this)">ADS &amp; Campanhas</div>
   </div>
 </nav>
+
+<!-- ═══════════════════════════════════════════
+     FILTER BAR
+═══════════════════════════════════════════ -->
+<div class="filters-wrap">
+  <div class="filters-inner">
+    <span class="f-label">Período</span>
+    <button class="f-chip active" id="fc-tudo"  onclick="setFiltro('tudo',this)">Tudo</button>
+    <button class="f-chip"        id="fc-7d"    onclick="setFiltro('7d',this)">7d</button>
+    <button class="f-chip"        id="fc-30d"   onclick="setFiltro('30d',this)">30d</button>
+    <button class="f-chip"        id="fc-tri"   onclick="setFiltro('tri',this)">Tri</button>
+    <button class="f-chip"        id="fc-livre" onclick="setFiltro('livre',this)">Livre</button>
+    <div class="f-sep"></div>
+    <div class="f-date-wrap hidden" id="date-range">
+      <span class="f-date-lbl">De</span>
+      <input type="date" class="f-date" id="f-de"  onchange="applyLivre()">
+      <span class="f-range-sep">→</span>
+      <span class="f-date-lbl">Até</span>
+      <input type="date" class="f-date" id="f-ate" onchange="applyLivre()">
+    </div>
+    <span class="f-periodo-tag hidden" id="periodo-tag"></span>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════════
      PAINEL 1 — VISÃO GERAL
@@ -928,6 +1049,95 @@ let rawCRM = [];
 let rawADS = [];
 let fetchErrors = [];
 
+/* ─── Filtro de período ─── */
+let filtroAtivo = 'tudo';
+let filtroDe    = null;
+let filtroAte   = null;
+let activeCRM   = []; // rawCRM após aplicar filtro
+
+function computeFilteredCRM() {
+  if (filtroAtivo === 'tudo' || (!filtroDe && !filtroAte)) return rawCRM;
+  return rawCRM.filter(r => {
+    const d = parseDate(normalizeDataCriacao(r));
+    if (!d) return true; // sem data → inclui
+    if (filtroDe && d < filtroDe) return false;
+    if (filtroAte && d > filtroAte) return false;
+    return true;
+  });
+}
+
+function setFiltro(tipo, el) {
+  filtroAtivo = tipo;
+  document.querySelectorAll('.f-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const dateRange = document.getElementById('date-range');
+  const tag = document.getElementById('periodo-tag');
+
+  if (tipo === 'tudo') {
+    filtroDe = null; filtroAte = null;
+    dateRange.classList.add('hidden');
+    tag.classList.add('hidden');
+
+  } else if (tipo === '7d') {
+    filtroDe = new Date(hoje); filtroDe.setDate(hoje.getDate() - 6);
+    filtroAte = new Date(hoje); filtroAte.setHours(23,59,59,999);
+    dateRange.classList.add('hidden');
+    tag.textContent = fmtTagPeriodo(filtroDe, filtroAte);
+    tag.classList.remove('hidden');
+
+  } else if (tipo === '30d') {
+    filtroDe = new Date(hoje); filtroDe.setDate(hoje.getDate() - 29);
+    filtroAte = new Date(hoje); filtroAte.setHours(23,59,59,999);
+    dateRange.classList.add('hidden');
+    tag.textContent = fmtTagPeriodo(filtroDe, filtroAte);
+    tag.classList.remove('hidden');
+
+  } else if (tipo === 'tri') {
+    const m = hoje.getMonth();
+    const qStart = Math.floor(m / 3) * 3;
+    filtroDe = new Date(hoje.getFullYear(), qStart, 1);
+    filtroAte = new Date(hoje.getFullYear(), qStart + 3, 0, 23, 59, 59, 999);
+    dateRange.classList.add('hidden');
+    tag.textContent = 'Q' + (Math.floor(m/3)+1) + ' · ' + hoje.getFullYear();
+    tag.classList.remove('hidden');
+
+  } else if (tipo === 'livre') {
+    dateRange.classList.remove('hidden');
+    tag.classList.add('hidden');
+    applyLivre();
+    return; // applyLivre chama applyFiltro
+  }
+
+  applyFiltro();
+}
+
+function applyLivre() {
+  const de  = document.getElementById('f-de').value;
+  const ate = document.getElementById('f-ate').value;
+  filtroDe  = de  ? new Date(de  + 'T00:00:00') : null;
+  filtroAte = ate ? new Date(ate + 'T23:59:59') : null;
+  const tag = document.getElementById('periodo-tag');
+  if (filtroDe || filtroAte) {
+    tag.textContent = fmtTagPeriodo(filtroDe, filtroAte);
+    tag.classList.remove('hidden');
+  } else {
+    tag.classList.add('hidden');
+  }
+  applyFiltro();
+}
+
+function applyFiltro() {
+  activeCRM = computeFilteredCRM();
+  renderAll();
+}
+
+function fmtTagPeriodo(de, ate) {
+  const fmt = d => d ? d.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' }) : '?';
+  return fmt(de) + ' → ' + fmt(ate);
+}
+
 /* ══════════════════════════════════════════════
    HELPERS
 ══════════════════════════════════════════════ */
@@ -1135,6 +1345,7 @@ function toggleDark() {
 ══════════════════════════════════════════════ */
 
 function renderAll() {
+  activeCRM = computeFilteredCRM();
   renderHeader();
   renderActive();
 }
@@ -1151,12 +1362,12 @@ function renderActive() {
 
 /* ── Header KPIs ── */
 function renderHeader() {
-  const total = rawCRM.length;
-  const ativos = rawCRM.filter(r => (r['Estado'] || r['Estado '] || '').trim() === 'Em Andamento').length;
-  const assin = rawCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato da Franquia').length;
-  document.getElementById('hk-total').textContent = total || '--';
-  document.getElementById('hk-ativos').textContent = ativos || '--';
-  document.getElementById('hk-assinaturas').textContent = assin || '--';
+  const total  = activeCRM.length;
+  const ativos = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
+  const assin  = activeCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato da Franquia').length;
+  document.getElementById('hk-total').textContent      = total  || '--';
+  document.getElementById('hk-ativos').textContent     = ativos || '--';
+  document.getElementById('hk-assinaturas').textContent = assin  || '--';
 }
 
 /* ── helpers de campo ── */
@@ -1196,9 +1407,9 @@ function normalizeDataCriacao(row) {
 ══════════════════════════════════════════════ */
 
 function renderVisaoGeral() {
-  const total = rawCRM.length;
-  const ativos = rawCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
-  const perdidos = rawCRM.filter(r => normalizeEstado(r) === 'Perdida').length;
+  const total   = activeCRM.length;
+  const ativos  = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
+  const perdidos = activeCRM.filter(r => normalizeEstado(r) === 'Perdida').length;
 
   /* CPL: investimento ADS total / total leads */
   const adsValorCol = rawADS.length
@@ -1216,13 +1427,13 @@ function renderVisaoGeral() {
   document.getElementById('vg-cpl').textContent      = investTotal > 0 ? fmtBRL2(cpl) : '--';
 
   renderFunil();
-  renderTimeline('timeline-container', rawCRM);
+  renderTimeline('timeline-container', activeCRM);
 }
 
 function renderFunil() {
   const counts = {};
   ETAPAS_FUNIL.forEach(e => { counts[e] = 0; });
-  rawCRM.forEach(r => {
+  activeCRM.forEach(r => {
     const e = normalizeEtapa(r);
     if (counts[e] !== undefined) counts[e]++;
   });
@@ -1310,31 +1521,26 @@ function renderTimeline(containerId, rows) {
 ══════════════════════════════════════════════ */
 
 function renderSDR() {
-  // Todos os leads passam pelo SDR — etapas 1-2 são território SDR
-  const total  = rawCRM.length;
-  // Qualificados = chegaram à etapa 3+ (encaminhados para expansão)
-  const qualif = rawCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r))).length;
+  const total  = activeCRM.length;
+  const qualif = activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r))).length;
   const taxa   = total > 0 ? (qualif / total) * 100 : 0;
 
   document.getElementById('sdr-total').textContent  = total || '--';
   document.getElementById('sdr-qualif').textContent = qualif || '--';
   document.getElementById('sdr-taxa').textContent   = fmtPct(taxa);
 
-  /* Perdas SDR = perdidos enquanto em etapas 1-2 */
-  const perdaSDR = rawCRM.filter(r =>
+  const perdaSDR = activeCRM.filter(r =>
     normalizeEstado(r) === 'Perdida' && ETAPAS_SDR.includes(normalizeEtapa(r))
   );
   renderMotivoPerda('sdr-perda-container', perdaSDR);
 
-  /* Pipeline ativo SDR = em andamento nas etapas 1-2 */
   renderPipelineAtivo(
     'sdr-pipeline-container',
-    rawCRM.filter(r => ETAPAS_SDR.includes(normalizeEtapa(r))),
+    activeCRM.filter(r => ETAPAS_SDR.includes(normalizeEtapa(r))),
     ETAPAS_SDR
   );
 
-  /* Ritmo semanal = todos os leads (todos entram pelo SDR) */
-  renderTimeline('sdr-semanal-container', rawCRM);
+  renderTimeline('sdr-semanal-container', activeCRM);
 }
 
 function renderMotivoPerda(containerId, rows) {
@@ -1402,7 +1608,7 @@ function renderPipelineAtivo(containerId, allRows, etapas) {
 ══════════════════════════════════════════════ */
 
 function renderExpansao() {
-  const expRows = rawCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
+  const expRows = activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
   const ativos  = expRows.filter(r => normalizeEstado(r) === 'Em Andamento');
   const assin   = expRows.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato da Franquia').length;
 
@@ -1420,7 +1626,7 @@ function renderExpansao() {
   document.getElementById('exp-assin').textContent   = assin;
 
   /* Alert box Outros */
-  const perdaExp = rawCRM.filter(r =>
+  const perdaExp = activeCRM.filter(r =>
     normalizeEstado(r) === 'Perdida' && ETAPAS_EXP.includes(normalizeEtapa(r))
   );
   const outros   = perdaExp.filter(r => {
@@ -1640,7 +1846,7 @@ function renderCplChart(list) {
 
 function renderFontesCRM() {
   const counts = {};
-  rawCRM.forEach(r => {
+  activeCRM.forEach(r => {
     const f = normalizeFonte(r) || 'Desconhecida';
     counts[f] = (counts[f] || 0) + 1;
   });
