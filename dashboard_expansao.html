@@ -1104,6 +1104,7 @@ let rawCRM = [];
 let rawADS = [];
 let fetchErrors = [];
 const chartInstances = {};
+if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
 
 /* ─── Filtro de período ─── */
 let filtroAtivo = 'tudo';
