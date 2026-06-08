@@ -790,6 +790,7 @@ body { background: var(--bg); color: var(--txt); }
       <input type="date" class="f-date" id="f-ate" onchange="applyLivre()">
     </div>
     <span class="f-periodo-tag hidden" id="periodo-tag"></span>
+    <span id="f-count" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--txt-faint);margin-left:6px;"></span>
   </div>
 </div>
 
@@ -1139,7 +1140,7 @@ function computeFilteredCRM() {
   if (!filtroDe && !filtroAte) return rawCRM;
   return rawCRM.filter(r => {
     const d = parseDate(normalizeDataCriacao(r));
-    if (!d) return true;
+    if (!d) return false;
     if (filtroDe && d < filtroDe) return false;
     if (filtroAte && d > filtroAte) return false;
     return true;
@@ -1150,12 +1151,14 @@ function computeFilteredADS() {
   if (!filtroDe && !filtroAte) return rawADS;
   if (!rawADS.length) return rawADS;
   const headers = Object.keys(rawADS[0]);
-  const dateCol = headers.find(h =>
-    h.toLowerCase().includes('início') || h.toLowerCase().includes('inicio') || h.toLowerCase().includes('início dos')
-  ) || headers[0];
+  const dateCol = headers.find(h => {
+    const l = h.toLowerCase();
+    return l.includes('início') || l.includes('inicio') || l.includes('start');
+  });
+  if (!dateCol) return rawADS; // coluna de data não encontrada → não filtra
   return rawADS.filter(r => {
     const d = parseDate(r[dateCol]);
-    if (!d) return true;
+    if (!d) return false;
     if (filtroDe && d < filtroDe) return false;
     if (filtroAte && d > filtroAte) return false;
     return true;
@@ -1291,9 +1294,9 @@ function parseDate(str) {
     // Se b > 12, só pode ser M/D/YYYY (a=mês, b=dia)
     // Se a > 12, só pode ser DD/MM/YYYY (a=dia, b=mês)
     // Ambíguo: assume M/D/YYYY (padrão Google Sheets)
-    if (b > 12) return new Date(y, a - 1, b); // M/D/YYYY
-    if (a > 12) return new Date(y, b - 1, a); // DD/MM/YYYY
-    return new Date(y, a - 1, b);             // ambíguo → M/D/YYYY
+    if (b > 12) return new Date(y, a - 1, b); // M/D/YYYY  (ex: 5/20/2026)
+    if (a > 12) return new Date(y, b - 1, a); // DD/MM/YYYY (ex: 20/05/2026)
+    return new Date(y, b - 1, a);             // ambíguo → DD/MM/YYYY (padrão BR)
   }
   const d = new Date(s);
   return isNaN(d) ? null : d;
@@ -1474,9 +1477,17 @@ function renderHeader() {
   const total  = activeCRM.length;
   const ativos = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
   const assin  = activeCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia').length;
-  document.getElementById('hk-total').textContent      = total  || '--';
-  document.getElementById('hk-ativos').textContent     = ativos || '--';
+  document.getElementById('hk-total').textContent       = total  || '--';
+  document.getElementById('hk-ativos').textContent      = ativos || '--';
   document.getElementById('hk-assinaturas').textContent = assin  || '--';
+
+  /* contador de filtro */
+  const countEl = document.getElementById('f-count');
+  if (countEl) {
+    countEl.textContent = (filtroAtivo !== 'tudo' && rawCRM.length)
+      ? `· ${activeCRM.length} de ${rawCRM.length} leads`
+      : '';
+  }
 }
 
 /* ── helpers de campo ── */
@@ -1508,7 +1519,11 @@ function normalizeFonte(row) {
 }
 
 function normalizeDataCriacao(row) {
-  return getField(row, 'Data de criação', 'Data de criacao', 'data de criação').trim();
+  for (const c of ['Data de criação', 'Data de criacao', 'data de criação', 'Data de Criação']) {
+    if (row[c] !== undefined) return (row[c] || '').trim();
+  }
+  const key = Object.keys(row).find(k => k.toLowerCase().includes('cria'));
+  return key ? (row[key] || '').trim() : '';
 }
 
 function normalizeTelefone(row) {
