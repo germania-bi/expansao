@@ -1591,6 +1591,27 @@ function normalizeProdutos(row) {
   return getField(row, 'Produtos', 'produtos').trim();
 }
 
+function normalizeDataFechamento(row) {
+  return getField(row, 'Data de Fechamento', 'Data de fechamento', 'data de fechamento').trim();
+}
+
+/* Retorna leads fechados filtrados por Data de Fechamento quando disponível */
+function getFechadosFiltered() {
+  const todos = rawCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia');
+  if (!filtroDe && !filtroAte) return todos;
+  return todos.filter(r => {
+    const df = normalizeDataFechamento(r);
+    if (df) {
+      const d = parseDate(df);
+      if (!d) return true;
+      if (filtroDe && d < filtroDe) return false;
+      if (filtroAte && d > filtroAte) return false;
+      return true;
+    }
+    return true; // sem Data de Fechamento → inclui sempre
+  });
+}
+
 /* ══════════════════════════════════════════════
    TAB 1: VISÃO GERAL
 ══════════════════════════════════════════════ */
@@ -1599,7 +1620,7 @@ function renderVisaoGeral() {
   const total   = activeCRM.length;
   const ativos  = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
 
-  const fechadosVG = activeCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia');
+  const fechadosVG = getFechadosFiltered();
   const valorFechadoVG = fechadosVG.reduce((s, r) => s + normalizeValorUnico(r), 0);
 
   document.getElementById('vg-fechados').textContent = fechadosVG.length || '--';
@@ -1807,9 +1828,7 @@ function renderSDR() {
   const total    = activeCRM.length;
   const qualif   = activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r))).length;
   const taxa     = total > 0 ? (qualif / total) * 100 : 0;
-  const fechados = activeCRM.filter(r =>
-    normalizeEtapa(r) === 'Assinatura do Contrato de Franquia'
-  ).length;
+  const fechados = getFechadosFiltered().length;
 
   document.getElementById('sdr-total').textContent  = total || '--';
   document.getElementById('sdr-qualif').textContent = qualif || '--';
@@ -1897,7 +1916,9 @@ function renderPipelineAtivo(containerId, allRows, etapas) {
 ══════════════════════════════════════════════ */
 
 function renderExpansao() {
-  const expRows = activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
+  /* Expansão usa rawCRM — o filtro de data não se aplica aqui porque
+     "entrou na expansão" ≠ "foi criado no período" */
+  const expRows = rawCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
   const ativos  = expRows.filter(r => normalizeEstado(r) === 'Em Andamento');
   const assin   = expRows.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia').length;
 
@@ -1969,20 +1990,22 @@ function renderExpansao() {
       '<div class="empty-state">Nenhum lead ativo nas etapas de expansão.</div>';
   }
 
-  /* Contratos fechados */
-  const fechadosRows = expRows
-    .filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia')
+  /* Contratos fechados — filtrados por Data de Fechamento quando disponível */
+  const fechadosRows = getFechadosFiltered()
     .map(r => ({
-      nome:  getField(r, 'Nome', 'nome') || 'Sem nome',
-      resp:  normalizeResp(r),
-      valor: normalizeValorUnico(r),
-      data:  normalizeDataCriacao(r),
+      nome:       getField(r, 'Nome', 'nome') || 'Sem nome',
+      resp:       normalizeResp(r),
+      valor:      normalizeValorUnico(r),
+      dataFech:   normalizeDataFechamento(r),
+      dataCriacao: normalizeDataCriacao(r),
     }))
     .sort((a, b) => b.valor - a.valor);
 
   const totalFechado = fechadosRows.reduce((s, r) => s + r.valor, 0);
   document.getElementById('exp-fechados-total').textContent =
     totalFechado > 0 ? fmtBRL(totalFechado) : '';
+
+  const temDataFech = fechadosRows.some(r => r.dataFech);
 
   if (fechadosRows.length) {
     const temValorF = fechadosRows.some(r => r.valor > 0);
@@ -1991,14 +2014,14 @@ function renderExpansao() {
         <thead><tr>
           <th>Nome</th><th>Responsável</th>
           ${temValorF ? '<th class="right">Valor</th>' : ''}
-          <th class="right">Data</th>
+          <th class="right">${temDataFech ? 'Fechamento' : 'Criação'}</th>
         </tr></thead>
         <tbody>
           ${fechadosRows.map(r => `<tr>
             <td>${esc(r.nome)}</td>
             <td>${esc(r.resp)}</td>
             ${temValorF ? `<td class="right">${r.valor > 0 ? fmtBRL(r.valor) : '—'}</td>` : ''}
-            <td class="right">${r.data || '—'}</td>
+            <td class="right">${esc(temDataFech ? (r.dataFech || '—') : (r.dataCriacao || '—'))}</td>
           </tr>`).join('')}
         </tbody>
       </table>`;
