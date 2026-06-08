@@ -1582,9 +1582,17 @@ function normalizeTelefone(row) {
 
 function normalizeValorUnico(row) {
   const s = getField(row, 'Valor Único', 'Valor Unico', 'valor único', 'valor unico').trim();
-  if (!s) return 0;
-  const cleaned = s.replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
-  return parseFloat(cleaned) || 0;
+  if (!s || s === '0' || s === '0.0' || s === '0,0') return 0;
+  let v = s.replace(/[R$\s]/g, '');
+  // Detectar formato: se tem vírgula decimal (pt-BR: 150.000,00)
+  if (/,\d{1,2}$/.test(v)) {
+    // Formato brasileiro: . = milhar, , = decimal → remove pontos, troca vírgula
+    v = v.replace(/\./g, '').replace(',', '.');
+  } else {
+    // Só número inteiro formatado (150.000) → remove pontos de milhar
+    v = v.replace(/\./g, '');
+  }
+  return parseFloat(v) || 0;
 }
 
 function normalizeProdutos(row) {
