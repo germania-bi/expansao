@@ -2314,7 +2314,7 @@ function renderCplChart(list) {
     const y  = i * (barH + gap);
     const bw = Math.max(4, Math.round((item.cpl / maxCpl) * barMaxW));
     return `
-      <text x="${labelW - 8}" y="${y + barH / 2 + 4}" text-anchor="end"
+      <text x="4" y="${y + barH / 2 + 4}" text-anchor="start"
         font-family="Barlow Condensed,sans-serif" font-size="12" fill="var(--txt-faint)">${esc(item.nome)}</text>
       <rect x="${labelW}" y="${y}" width="${bw}" height="${barH}" rx="3" fill="#C8941A" opacity="0.85"/>
       <text x="${labelW + bw + 8}" y="${y + barH / 2 + 4}"
