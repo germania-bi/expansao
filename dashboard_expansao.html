@@ -979,7 +979,7 @@ body { background: var(--bg); color: var(--txt); }
         <div style="display:flex;align-items:center;justify-content:space-between">
           <div>
             <div class="c-title">Contratos Fechados</div>
-            <div class="c-sub">Assinatura do Contrato da Franquia</div>
+            <div class="c-sub">Assinatura do Contrato de Franquia</div>
           </div>
           <span id="exp-fechados-total" style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--gold)"></span>
         </div>
@@ -1349,7 +1349,7 @@ const ETAPAS_FUNIL = [
   'Encaminhamento para Expansão',
   'Contato Comercial',
   'Apresentação do Projeto de Viabilidade',
-  'Assinatura do Contrato da Franquia',
+  'Assinatura do Contrato de Franquia',
 ];
 
 const ETAPAS_SDR = ['Interesse Inicial', 'Coleta de Dados'];
@@ -1357,7 +1357,7 @@ const ETAPAS_EXP = [
   'Encaminhamento para Expansão',
   'Contato Comercial',
   'Apresentação do Projeto de Viabilidade',
-  'Assinatura do Contrato da Franquia',
+  'Assinatura do Contrato de Franquia',
 ];
 
 /* ══════════════════════════════════════════════
@@ -1473,7 +1473,7 @@ function renderActive() {
 function renderHeader() {
   const total  = activeCRM.length;
   const ativos = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
-  const assin  = activeCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato da Franquia').length;
+  const assin  = activeCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia').length;
   document.getElementById('hk-total').textContent      = total  || '--';
   document.getElementById('hk-ativos').textContent     = ativos || '--';
   document.getElementById('hk-assinaturas').textContent = assin  || '--';
@@ -1534,7 +1534,7 @@ function renderVisaoGeral() {
   const total   = activeCRM.length;
   const ativos  = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
 
-  const fechadosVG = activeCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato da Franquia');
+  const fechadosVG = activeCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia');
   const valorFechadoVG = fechadosVG.reduce((s, r) => s + normalizeValorUnico(r), 0);
 
   document.getElementById('vg-fechados').textContent = fechadosVG.length || '--';
@@ -1743,7 +1743,7 @@ function renderSDR() {
   const qualif   = activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r))).length;
   const taxa     = total > 0 ? (qualif / total) * 100 : 0;
   const fechados = activeCRM.filter(r =>
-    normalizeEtapa(r) === 'Assinatura do Contrato da Franquia'
+    normalizeEtapa(r) === 'Assinatura do Contrato de Franquia'
   ).length;
 
   document.getElementById('sdr-total').textContent  = total || '--';
@@ -1834,7 +1834,7 @@ function renderPipelineAtivo(containerId, allRows, etapas) {
 function renderExpansao() {
   const expRows = activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
   const ativos  = expRows.filter(r => normalizeEstado(r) === 'Em Andamento');
-  const assin   = expRows.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato da Franquia').length;
+  const assin   = expRows.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia').length;
 
   /* Média de dias por etapa */
   const cc = ativos.filter(r => normalizeEtapa(r) === 'Contato Comercial');
@@ -1845,7 +1845,7 @@ function renderExpansao() {
     : null;
 
   const valorContratado = expRows
-    .filter(r => normalizeEtapa(r) === 'Assinatura do Contrato da Franquia')
+    .filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia')
     .reduce((s, r) => s + normalizeValorUnico(r), 0);
 
   document.getElementById('exp-total').textContent   = expRows.length || '--';
@@ -1906,7 +1906,7 @@ function renderExpansao() {
 
   /* Contratos fechados */
   const fechadosRows = expRows
-    .filter(r => normalizeEtapa(r) === 'Assinatura do Contrato da Franquia')
+    .filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia')
     .map(r => ({
       nome:  getField(r, 'Nome', 'nome') || 'Sem nome',
       resp:  normalizeResp(r),
