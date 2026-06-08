@@ -37,6 +37,7 @@ body {
   --gold:      #FFA62C;
   --gold-lt:   #FFB84D;
   --red:       #C92B1E;
+  --red-gd:    linear-gradient(#7A1208 0%, #A82218 40%, #C92B1E 100%);
   --red-bg:    rgba(201,43,30,0.12);
   --circ-bg:   #3A2A14;
   --green:     #4CAF7D;
@@ -54,6 +55,7 @@ body {
   --gold:      #C8941A;
   --gold-lt:   #E0A82C;
   --red:       #C92B1E;
+  --red-gd:    linear-gradient(#7A1208 0%, #A82218 40%, #C92B1E 100%);
   --red-bg:    rgba(201,43,30,0.08);
   --circ-bg:   #EFE6D4;
   --green:     #2E7D52;
@@ -67,7 +69,7 @@ body { background: var(--bg); color: var(--txt); }
    HEADER
 ══════════════════════════════════════════════ */
 .header {
-  background: var(--red);
+  background: var(--red-gd);
   padding: 0;
   margin-bottom: 0;
 }
@@ -75,24 +77,16 @@ body { background: var(--bg); color: var(--txt); }
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 14px 28px;
+  padding: 16px 28px;
+  min-height: 96px;
   max-width: 1600px;
   margin: 0 auto;
 }
 .h-logo {
-  width: 52px;
-  height: 52px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 22px;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -1px;
 }
 .h-brand { flex: 1; }
 .eyebrow {
@@ -106,9 +100,9 @@ body { background: var(--bg); color: var(--txt); }
 }
 .h-title {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: #fff;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--gold-lt);
   letter-spacing: 0.5px;
   line-height: 1.1;
 }
@@ -129,9 +123,17 @@ body { background: var(--bg); color: var(--txt); }
 }
 .h-kpis {
   display: flex;
-  gap: 24px;
+  gap: 10px;
 }
-.hk { display: flex; flex-direction: column; gap: 1px; }
+.hk {
+  display: flex; flex-direction: column; gap: 1px;
+  background: rgba(0,0,0,0.22);
+  border: 0.8px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 10px 18px;
+  text-align: center;
+  min-width: 110px;
+}
 .hk-l {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 10px;
@@ -142,10 +144,17 @@ body { background: var(--bg); color: var(--txt); }
 }
 .hk-v {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 36px;
+  font-weight: 900;
   color: #FFA62C;
   line-height: 1;
+}
+.hk-sub {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  color: rgba(241,227,206,0.45);
+  margin-top: 3px;
+  white-space: nowrap;
 }
 .h-actions {
   display: flex;
@@ -199,6 +208,8 @@ body { background: var(--bg); color: var(--txt); }
 }
 .tabs {
   display: flex;
+  gap: 4px;
+  align-items: flex-end;
   padding: 0 28px;
   max-width: 1600px;
   margin: 0 auto;
@@ -206,22 +217,20 @@ body { background: var(--bg); color: var(--txt); }
 .tab {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 800;
   letter-spacing: 0.8px;
   text-transform: uppercase;
   color: rgba(255,230,200,0.65);
   padding: 10px 20px;
   cursor: pointer;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -3px;
-  transition: color 0.15s;
+  border-radius: 6px 6px 0 0;
+  transition: color 0.15s, background 0.15s;
   white-space: nowrap;
 }
-.tab:hover:not(.active) { color: rgba(255,255,255,0.9); }
+.tab:hover:not(.active) { color: rgba(255,255,255,0.9); background: rgba(0,0,0,0.15); }
 .tab.active {
-  color: #FFA62C;
+  color: var(--gold-lt);
   background: var(--bg2);
-  border-bottom-color: #FFA62C;
 }
 
 /* ══════════════════════════════════════════════
@@ -485,15 +494,6 @@ body { background: var(--bg); color: var(--txt); }
   border-bottom: 1px solid var(--border);
 }
 
-/* ══════════════════════════════════════════════
-   LAST UPDATED
-══════════════════════════════════════════════ */
-.last-updated {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 11px;
-  color: rgba(255,230,200,0.4);
-  margin-left: 16px;
-}
 
 /* ══════════════════════════════════════════════
    LOADING / ERROR OVERLAYS
@@ -779,7 +779,7 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
 ═══════════════════════════════════════════ -->
 <header class="header">
   <div class="header-inner">
-    <div class="h-logo">G</div>
+    <div class="h-logo"><img src="https://res.cloudinary.com/drq9nnioe/image/upload/v1777428373/logo-germania_1_l1nxcl.png" alt="Germânia" style="width:70px;height:70px;object-fit:contain"></div>
     <div class="h-brand">
       <div class="eyebrow">Germânia · Cervejaria · Dashboard Comercial</div>
       <div class="h-title">Expansão / Franquias Lig Chopp</div>
@@ -791,18 +791,20 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
         <div class="hk">
           <div class="hk-l">Total Leads</div>
           <div class="hk-v" id="hk-total">--</div>
+          <div class="hk-sub" id="hk-total-sub">no período</div>
         </div>
         <div class="hk">
           <div class="hk-l">Ativos</div>
           <div class="hk-v" id="hk-ativos">--</div>
+          <div class="hk-sub" id="hk-ativos-sub">em prospecção</div>
         </div>
         <div class="hk">
           <div class="hk-l">Assinaturas</div>
           <div class="hk-v" id="hk-assinaturas">--</div>
+          <div class="hk-sub" id="hk-assinaturas-sub">franquias fechadas</div>
         </div>
       </div>
     </div>
-    <span class="last-updated" id="last-updated" style="margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:rgba(255,230,200,0.4);"></span>
   </div>
 </header>
 
@@ -1476,11 +1478,7 @@ function hideError() {
   document.getElementById('error-overlay').classList.remove('visible');
 }
 
-function updateLastUpdated() {
-  const now = new Date();
-  const t = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  document.getElementById('last-updated').textContent = 'Atualizado ' + t;
-}
+function updateLastUpdated() {}
 
 /* ══════════════════════════════════════════════
    TAB SWITCHING
