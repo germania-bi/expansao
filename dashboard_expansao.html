@@ -1459,6 +1459,11 @@ const ETAPAS_FUNIL = [
 ];
 
 const ETAPAS_SDR = ['Interesse Inicial', 'Coleta de Dados'];
+
+/* Localização manual por nome de lead (não vem da planilha) */
+const LOCALIZACOES = {
+  // 'Nome Exato do Lead': 'Cidade-UF'
+};
 const ETAPAS_EXP = [
   'Encaminhamento para Expansão',
   'Contato Comercial',
@@ -2012,11 +2017,12 @@ function renderExpansao() {
   /* Contratos fechados — filtrados por Data de Fechamento quando disponível */
   const fechadosRows = getFechadosFiltered()
     .map(r => ({
-      nome:       getField(r, 'Nome', 'nome') || 'Sem nome',
-      resp:       normalizeResp(r),
-      valor:      normalizeValorUnico(r),
-      dataFech:   normalizeDataFechamento(r),
+      nome:        getField(r, 'Nome', 'nome') || 'Sem nome',
+      resp:        normalizeResp(r),
+      valor:       normalizeValorUnico(r),
+      dataFech:    normalizeDataFechamento(r),
       dataCriacao: normalizeDataCriacao(r),
+      local:       LOCALIZACOES[getField(r, 'Nome', 'nome')] || '—',
     }))
     .sort((a, b) => b.valor - a.valor);
 
@@ -2031,7 +2037,7 @@ function renderExpansao() {
     document.getElementById('exp-fechados-container').innerHTML = `
       <table class="ez-table">
         <thead><tr>
-          <th>Nome</th><th>Responsável</th>
+          <th>Nome</th><th>Responsável</th><th>Localização</th>
           ${temValorF ? '<th class="right">Valor</th>' : ''}
           <th class="right">${temDataFech ? 'Fechamento' : 'Criação'}</th>
         </tr></thead>
@@ -2039,6 +2045,7 @@ function renderExpansao() {
           ${fechadosRows.map(r => `<tr>
             <td>${esc(r.nome)}</td>
             <td>${esc(r.resp)}</td>
+            <td>${esc(r.local)}</td>
             ${temValorF ? `<td class="right">${r.valor > 0 ? fmtBRL(r.valor) : '—'}</td>` : ''}
             <td class="right">${esc(temDataFech ? (r.dataFech || '—') : (r.dataCriacao || '—'))}</td>
           </tr>`).join('')}
@@ -2247,7 +2254,8 @@ function renderAdsCampanhas(page) {
 
   const tRows = items.map(([nome, d]) => {
     const cpl   = d.leads > 0 ? fmtBRL2(d.valor / d.leads) : '--';
-    const label = nome.length > 40 ? nome.slice(0, 40) + '…' : nome;
+    const clean = stripBrackets(nome);
+    const label = clean.length > 40 ? clean.slice(0, 40) + '…' : clean;
     const status = d.ativa
       ? '<span class="chip chip-active">Ativa</span>'
       : '<span class="chip chip-paused">Encerrada</span>';
@@ -2280,10 +2288,17 @@ function renderAdsCampanhas(page) {
     </table>${pag}`;
 }
 
+function stripBrackets(str) {
+  return str.replace(/\[.*?\]\s*/g, '').trim();
+}
+
 function renderCplChart(list) {
   const data = list
     .filter(([, d]) => d.leads > 0)
-    .map(([nome, d]) => ({ nome: nome.length > 30 ? nome.slice(0, 30) + '…' : nome, cpl: d.valor / d.leads }))
+    .map(([nome, d]) => {
+      const clean = stripBrackets(nome);
+      return { nome: clean.length > 35 ? clean.slice(0, 35) + '…' : clean, cpl: d.valor / d.leads };
+    })
     .slice(0, 10);
 
   if (!data.length) {
@@ -2295,23 +2310,22 @@ function renderCplChart(list) {
   const barH = 26, gap = 10;
   const svgH = data.length * (barH + gap);
 
-  /* largura dinâmica */
   const cplContainer = document.getElementById('ads-cpl-chart');
-  const cplW = (cplContainer && cplContainer.offsetWidth > 200) ? cplContainer.offsetWidth - 8 : 500;
-  const labelW = Math.min(200, Math.round(cplW * 0.38));
-  const valW   = 80;
-  const barMaxW = cplW - labelW - valW - 16;
+  const cplW    = (cplContainer && cplContainer.offsetWidth > 200) ? cplContainer.offsetWidth - 8 : 500;
+  const valW    = 72;
+  const nameW   = Math.min(200, Math.round(cplW * 0.36));
+  const barMaxW = cplW - valW - nameW - 24;
   const totalW  = cplW;
 
   const bars = data.map((item, i) => {
     const y  = i * (barH + gap);
     const bw = Math.max(4, Math.round((item.cpl / maxCpl) * barMaxW));
     return `
-      <text x="${labelW - 8}" y="${y + barH / 2 + 4}" text-anchor="end"
-        font-family="Barlow Condensed,sans-serif" font-size="12" fill="var(--txt-faint)">${esc(item.nome)}</text>
-      <rect x="${labelW}" y="${y}" width="${bw}" height="${barH}" rx="3" fill="#C8941A" opacity="0.85"/>
-      <text x="${labelW + bw + 8}" y="${y + barH / 2 + 4}"
-        font-family="Barlow Condensed,sans-serif" font-size="13" font-weight="700" fill="var(--gold)">${fmtBRL2(item.cpl)}</text>`;
+      <rect x="0" y="${y}" width="${bw}" height="${barH}" rx="3" fill="#C8941A" opacity="0.85"/>
+      <text x="${bw + 8}" y="${y + barH / 2 + 4}"
+        font-family="Barlow Condensed,sans-serif" font-size="13" font-weight="700" fill="var(--gold)">${fmtBRL2(item.cpl)}</text>
+      <text x="${totalW}" y="${y + barH / 2 + 4}" text-anchor="end"
+        font-family="Barlow Condensed,sans-serif" font-size="12" fill="var(--txt-faint)">${esc(item.nome)}</text>`;
   }).join('');
 
   document.getElementById('ads-cpl-chart').innerHTML = `
