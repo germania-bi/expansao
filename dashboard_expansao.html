@@ -810,8 +810,9 @@ body { background: var(--bg); color: var(--txt); }
         <div class="mkpi-l">Ativos (Em Andamento)</div>
       </div>
       <div class="mkpi">
-        <div class="mkpi-v" id="vg-perdidos">--</div>
-        <div class="mkpi-l">Perdidos</div>
+        <div class="mkpi-v" id="vg-fechados">--</div>
+        <div class="mkpi-l">Fechados</div>
+        <div class="mkpi-sub" id="vg-fechados-valor">Contratos assinados</div>
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="vg-cpl">--</div>
@@ -858,7 +859,7 @@ body { background: var(--bg); color: var(--txt); }
   <div class="panel-inner">
 
     <!-- KPIs -->
-    <div class="mkpi-row cols-3">
+    <div class="mkpi-row cols-4">
       <div class="mkpi">
         <div class="mkpi-v" id="sdr-total">--</div>
         <div class="mkpi-l">Leads Recebidos</div>
@@ -873,6 +874,11 @@ body { background: var(--bg); color: var(--txt); }
         <div class="mkpi-v" id="sdr-taxa">--</div>
         <div class="mkpi-l">Taxa de Qualificação</div>
         <div class="mkpi-sub">Qualificados ÷ total</div>
+      </div>
+      <div class="mkpi">
+        <div class="mkpi-v" id="sdr-fechados">--</div>
+        <div class="mkpi-l">Fechados</div>
+        <div class="mkpi-sub" id="sdr-fechados-sub">contratos assinados</div>
       </div>
     </div>
 
@@ -965,6 +971,22 @@ body { background: var(--bg); color: var(--txt); }
         <div class="empty-state">Aguardando dados...</div>
       </div>
       <p class="footnote">* Dias calculados desde a criação do lead — RD Station não exporta data de entrada por etapa.</p>
+    </div>
+
+    <!-- Contratos Fechados -->
+    <div class="card">
+      <div class="card-header">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="c-title">Contratos Fechados</div>
+            <div class="c-sub">Assinatura do Contrato da Franquia</div>
+          </div>
+          <span id="exp-fechados-total" style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--gold)"></span>
+        </div>
+      </div>
+      <div id="exp-fechados-container">
+        <div class="empty-state">Nenhum contrato fechado ainda.</div>
+      </div>
     </div>
 
     <div class="grid-2">
@@ -1511,7 +1533,13 @@ function normalizeProdutos(row) {
 function renderVisaoGeral() {
   const total   = activeCRM.length;
   const ativos  = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
-  const perdidos = activeCRM.filter(r => normalizeEstado(r) === 'Perdida').length;
+
+  const fechadosVG = activeCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato da Franquia');
+  const valorFechadoVG = fechadosVG.reduce((s, r) => s + normalizeValorUnico(r), 0);
+
+  document.getElementById('vg-fechados').textContent = fechadosVG.length || '--';
+  document.getElementById('vg-fechados-valor').textContent =
+    valorFechadoVG > 0 ? fmtBRL(valorFechadoVG) : 'Contratos assinados';
 
   /* CPL: investimento ADS filtrado / total leads */
   const adsValorCol = activeADS.length
@@ -1523,10 +1551,9 @@ function renderVisaoGeral() {
   }, 0);
   const cpl = total > 0 ? investTotal / total : 0;
 
-  document.getElementById('vg-total').textContent    = total;
-  document.getElementById('vg-ativos').textContent   = ativos;
-  document.getElementById('vg-perdidos').textContent = perdidos;
-  document.getElementById('vg-cpl').textContent      = investTotal > 0 ? fmtBRL2(cpl) : '--';
+  document.getElementById('vg-total').textContent  = total;
+  document.getElementById('vg-ativos').textContent = ativos;
+  document.getElementById('vg-cpl').textContent    = investTotal > 0 ? fmtBRL2(cpl) : '--';
 
   renderFunil();
   renderTimeline('timeline-container', activeCRM);
@@ -1712,13 +1739,19 @@ function renderTimeline(containerId, rows) {
 ══════════════════════════════════════════════ */
 
 function renderSDR() {
-  const total  = activeCRM.length;
-  const qualif = activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r))).length;
-  const taxa   = total > 0 ? (qualif / total) * 100 : 0;
+  const total    = activeCRM.length;
+  const qualif   = activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r))).length;
+  const taxa     = total > 0 ? (qualif / total) * 100 : 0;
+  const fechados = activeCRM.filter(r =>
+    normalizeEtapa(r) === 'Assinatura do Contrato da Franquia'
+  ).length;
 
   document.getElementById('sdr-total').textContent  = total || '--';
   document.getElementById('sdr-qualif').textContent = qualif || '--';
   document.getElementById('sdr-taxa').textContent   = fmtPct(taxa);
+  document.getElementById('sdr-fechados').textContent = fechados || '--';
+  document.getElementById('sdr-fechados-sub').textContent =
+    qualif > 0 ? `de ${qualif} qualificados` : 'contratos assinados';
 
   const perdaSDR = activeCRM.filter(r =>
     normalizeEstado(r) === 'Perdida' && ETAPAS_SDR.includes(normalizeEtapa(r))
@@ -1869,6 +1902,44 @@ function renderExpansao() {
   } else {
     document.getElementById('exp-ativos-container').innerHTML =
       '<div class="empty-state">Nenhum lead ativo nas etapas de expansão.</div>';
+  }
+
+  /* Contratos fechados */
+  const fechadosRows = expRows
+    .filter(r => normalizeEtapa(r) === 'Assinatura do Contrato da Franquia')
+    .map(r => ({
+      nome:  getField(r, 'Nome', 'nome') || 'Sem nome',
+      resp:  normalizeResp(r),
+      valor: normalizeValorUnico(r),
+      data:  normalizeDataCriacao(r),
+    }))
+    .sort((a, b) => b.valor - a.valor);
+
+  const totalFechado = fechadosRows.reduce((s, r) => s + r.valor, 0);
+  document.getElementById('exp-fechados-total').textContent =
+    totalFechado > 0 ? fmtBRL(totalFechado) : '';
+
+  if (fechadosRows.length) {
+    const temValorF = fechadosRows.some(r => r.valor > 0);
+    document.getElementById('exp-fechados-container').innerHTML = `
+      <table class="ez-table">
+        <thead><tr>
+          <th>Nome</th><th>Responsável</th>
+          ${temValorF ? '<th class="right">Valor</th>' : ''}
+          <th class="right">Data</th>
+        </tr></thead>
+        <tbody>
+          ${fechadosRows.map(r => `<tr>
+            <td>${esc(r.nome)}</td>
+            <td>${esc(r.resp)}</td>
+            ${temValorF ? `<td class="right">${r.valor > 0 ? fmtBRL(r.valor) : '—'}</td>` : ''}
+            <td class="right">${r.data || '—'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } else {
+    document.getElementById('exp-fechados-container').innerHTML =
+      '<div class="empty-state">Nenhum contrato fechado ainda.</div>';
   }
 
   /* Por responsável */
