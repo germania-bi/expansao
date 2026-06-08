@@ -2288,10 +2288,7 @@ function stripBrackets(str) {
 function renderCplChart(list) {
   const data = list
     .filter(([, d]) => d.leads > 0)
-    .map(([nome, d]) => {
-      const clean = stripBrackets(nome);
-      return { nome: clean.length > 35 ? clean.slice(0, 35) + '…' : clean, cpl: d.valor / d.leads };
-    })
+    .map(([nome, d]) => ({ nome: nome.length > 38 ? nome.slice(0, 38) + '…' : nome, cpl: d.valor / d.leads }))
     .slice(0, 10);
 
   if (!data.length) {
