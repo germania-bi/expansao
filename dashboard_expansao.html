@@ -464,6 +464,34 @@ body { background: var(--bg); color: var(--txt); }
   margin-top: 8px;
   font-style: italic;
 }
+.pag-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 0 2px;
+}
+.btn-pag {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: var(--bg3);
+  color: var(--txt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-pag:hover:not(:disabled) { background: var(--card-bg); }
+.btn-pag:disabled { opacity: 0.35; cursor: default; }
+.pag-info {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  color: var(--txt-faint);
+}
 
 /* ══════════════════════════════════════════════
    STATUS CHIP
@@ -1016,27 +1044,10 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
         <div class="mkpi-sub">Leads ativos nessa etapa</div>
       </div>
       <div class="mkpi">
-        <div class="mkpi-v" id="exp-assin">--</div>
+        <div class="mkpi-v" id="exp-assin" style="color:var(--green)">--</div>
         <div class="mkpi-l">Assinaturas</div>
         <div class="mkpi-sub" id="exp-assin-valor">Contratos assinados</div>
       </div>
-    </div>
-
-    <!-- Alert box -->
-    <div class="alert-box" id="exp-alert">
-      Aguardando dados...
-    </div>
-
-    <!-- Leads ativos com dias parados -->
-    <div class="card">
-      <div class="card-header">
-        <div class="c-title">Leads Ativos — Dias no Pipeline</div>
-        <div class="c-sub">Contato Comercial e Apresentação · ordenado por mais antigo</div>
-      </div>
-      <div id="exp-ativos-container">
-        <div class="empty-state">Aguardando dados...</div>
-      </div>
-      <p class="footnote">* Dias calculados desde a criação do lead — RD Station não exporta data de entrada por etapa.</p>
     </div>
 
     <!-- Contratos Fechados -->
@@ -1053,6 +1064,26 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       <div id="exp-fechados-container">
         <div class="empty-state">Nenhum contrato fechado ainda.</div>
       </div>
+    </div>
+
+    <!-- Leads ativos com dias parados -->
+    <div class="card">
+      <div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div>
+          <div class="c-title">Leads Ativos — Dias no Pipeline</div>
+          <div class="c-sub">Contato Comercial e Apresentação · ordenado por mais antigo</div>
+        </div>
+        <select id="exp-dias-filtro" onchange="expAtivosDiasMin=+this.value;expAtivosPage=0;renderExpAtivos(0)" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;background:var(--bg3);color:var(--txt);border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer">
+          <option value="0">Todos os dias</option>
+          <option value="30">&gt; 30 dias</option>
+          <option value="60">&gt; 60 dias</option>
+          <option value="90">&gt; 90 dias</option>
+        </select>
+      </div>
+      <div id="exp-ativos-container">
+        <div class="empty-state">Aguardando dados...</div>
+      </div>
+      <p class="footnote">* Dias calculados desde a criação do lead — RD Station não exporta data de entrada por etapa.</p>
     </div>
 
     <div class="grid-2">
@@ -1200,6 +1231,9 @@ let filtroDe    = null;
 let filtroAte   = null;
 let activeCRM   = [];
 let activeADS   = [];
+let expAtivosData  = [];
+let expAtivosPage  = 0;
+let expAtivosDiasMin = 0;
 let fpFrom, fpTo;
 
 function computeFilteredCRM() {
@@ -1949,21 +1983,13 @@ function renderExpansao() {
   document.getElementById('exp-assin-valor').textContent =
     valorContratado > 0 ? fmtBRL(valorContratado) : 'Contratos assinados';
 
-  /* Alert box Outros */
+  /* Perdas Expansão (para motivos) */
   const perdaExp = activeCRM.filter(r =>
     normalizeEstado(r) === 'Perdida' && ETAPAS_EXP.includes(normalizeEtapa(r))
   );
-  const outros   = perdaExp.filter(r => {
-    const m = normalizeMotivo(r).toLowerCase();
-    return m === 'outros' || m === 'nada' || m === '';
-  });
-  const pctOutros = perdaExp.length > 0 ? ((outros.length / perdaExp.length) * 100).toFixed(0) : 0;
-  document.getElementById('exp-alert').innerHTML =
-    `<strong>⚠️ ${outros.length} leads perdidos sem motivo registrado (${pctOutros}%)</strong> — ` +
-    `o campo "Outros" domina as perdas na expansão. Análise de perda inviável sem melhoria na classificação.`;
 
-  /* Tabela ativos com dias parados */
-  const ativosEtapas = ativos.filter(r =>
+  /* Tabela ativos com dias parados — paginada */
+  expAtivosData = ativos.filter(r =>
     ['Contato Comercial', 'Apresentação do Projeto de Viabilidade'].includes(normalizeEtapa(r))
   ).map(r => ({
     nome:  getField(r, 'Nome', 'nome') || 'Sem nome',
@@ -1972,31 +1998,8 @@ function renderExpansao() {
     dias:  diasNoPipeline(normalizeDataCriacao(r)),
     valor: normalizeValorUnico(r),
   })).sort((a, b) => b.dias - a.dias);
-
-  const temValor = ativosEtapas.some(i => i.valor > 0);
-
-  if (ativosEtapas.length) {
-    const rows_html = ativosEtapas.map(item => `
-      <tr>
-        <td>${esc(item.nome)}</td>
-        <td>${esc(item.etapa)}</td>
-        <td>${esc(item.resp)}</td>
-        ${temValor ? `<td class="right">${item.valor > 0 ? fmtBRL(item.valor) : '—'}</td>` : ''}
-        <td class="right"><span class="badge-dias ${classeDias(item.dias)}">${item.dias}d</span></td>
-      </tr>`).join('');
-    document.getElementById('exp-ativos-container').innerHTML = `
-      <table class="ez-table">
-        <thead><tr>
-          <th>Nome</th><th>Etapa</th><th>Responsável</th>
-          ${temValor ? '<th class="right">Valor</th>' : ''}
-          <th class="right">Dias</th>
-        </tr></thead>
-        <tbody>${rows_html}</tbody>
-      </table>`;
-  } else {
-    document.getElementById('exp-ativos-container').innerHTML =
-      '<div class="empty-state">Nenhum lead ativo nas etapas de expansão.</div>';
-  }
+  expAtivosPage = 0;
+  renderExpAtivos(0);
 
   /* Contratos fechados — filtrados por Data de Fechamento quando disponível */
   const fechadosRows = getFechadosFiltered()
@@ -2046,6 +2049,49 @@ function renderExpansao() {
 
   /* Motivos de perda expansão */
   renderMotivoPerda('exp-perda-container', perdaExp);
+}
+
+function renderExpAtivos(page) {
+  expAtivosPage = page;
+  const minDias = expAtivosDiasMin || 0;
+  const filtered = expAtivosData.filter(i => i.dias >= minDias);
+  const perPage  = 10;
+  const total    = filtered.length;
+  const totalPag = Math.ceil(total / perPage);
+  const items    = filtered.slice(page * perPage, (page + 1) * perPage);
+  const temValor = expAtivosData.some(i => i.valor > 0);
+
+  if (!total) {
+    document.getElementById('exp-ativos-container').innerHTML =
+      '<div class="empty-state">Nenhum lead ativo com esse filtro.</div>';
+    return;
+  }
+
+  const rows_html = items.map(item => `
+    <tr>
+      <td>${esc(item.nome)}</td>
+      <td>${esc(item.etapa)}</td>
+      <td>${esc(item.resp)}</td>
+      ${temValor ? `<td class="right">${item.valor > 0 ? fmtBRL(item.valor) : '—'}</td>` : ''}
+      <td class="right"><span class="badge-dias ${classeDias(item.dias)}">${item.dias}d</span></td>
+    </tr>`).join('');
+
+  const pag = totalPag > 1 ? `
+    <div class="pag-controls">
+      <button class="btn-pag" ${page === 0 ? 'disabled' : ''} onclick="renderExpAtivos(${page - 1})">← Ant</button>
+      <span class="pag-info">${page + 1} / ${totalPag} &nbsp;·&nbsp; ${total} leads</span>
+      <button class="btn-pag" ${page === totalPag - 1 ? 'disabled' : ''} onclick="renderExpAtivos(${page + 1})">Próx →</button>
+    </div>` : '';
+
+  document.getElementById('exp-ativos-container').innerHTML = `
+    <table class="ez-table">
+      <thead><tr>
+        <th>Nome</th><th>Etapa</th><th>Responsável</th>
+        ${temValor ? '<th class="right">Valor</th>' : ''}
+        <th class="right">Dias</th>
+      </tr></thead>
+      <tbody>${rows_html}</tbody>
+    </table>${pag}`;
 }
 
 function renderResponsaveis(containerId, rows) {
