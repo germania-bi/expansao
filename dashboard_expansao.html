@@ -845,11 +845,6 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
           <div class="hk-v" id="hk-assinaturas">--</div>
           <div class="hk-sub" id="hk-assinaturas-sub">franquias fechadas</div>
         </div>
-        <div class="hk">
-          <div class="hk-l">Fechados</div>
-          <div class="hk-v" id="hk-fechados" style="color:var(--green)">--</div>
-          <div class="hk-sub" id="hk-fechados-sub">no período</div>
-        </div>
       </div>
     </div>
   </div>
@@ -921,7 +916,7 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
         <div class="mkpi-l">Ativos (Em Andamento)</div>
       </div>
       <div class="mkpi">
-        <div class="mkpi-v" id="vg-fechados">--</div>
+        <div class="mkpi-v" id="vg-fechados" style="color:var(--green)">--</div>
         <div class="mkpi-l">Fechados</div>
         <div class="mkpi-sub" id="vg-fechados-valor">Contratos assinados</div>
       </div>
@@ -987,7 +982,7 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
         <div class="mkpi-sub">Qualificados ÷ total</div>
       </div>
       <div class="mkpi">
-        <div class="mkpi-v" id="sdr-fechados">--</div>
+        <div class="mkpi-v" id="sdr-fechados" style="color:var(--green)">--</div>
         <div class="mkpi-l">Fechados</div>
         <div class="mkpi-sub" id="sdr-fechados-sub">contratos assinados</div>
       </div>
@@ -1160,9 +1155,9 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
         <div class="mkpi-sub">Soma de resultados</div>
       </div>
       <div class="mkpi">
-        <div class="mkpi-v" id="ads-ativas">--</div>
-        <div class="mkpi-l">Campanhas Ativas</div>
-        <div class="mkpi-sub">Veiculação = active</div>
+        <div class="mkpi-v" id="ads-fechados" style="color:var(--green)">--</div>
+        <div class="mkpi-l">Fechados</div>
+        <div class="mkpi-sub" id="ads-fechados-sub">no período</div>
       </div>
     </div>
 
@@ -1462,7 +1457,7 @@ const ETAPAS_SDR = ['Interesse Inicial', 'Coleta de Dados'];
 
 /* Localização manual por nome de lead (não vem da planilha) */
 const LOCALIZACOES = {
-  // 'Nome Exato do Lead': 'Cidade-UF'
+  'Fabiano Guidetti': 'Ribeirão Preto-SP',
 };
 const ETAPAS_EXP = [
   'Encaminhamento para Expansão',
@@ -1580,14 +1575,12 @@ function renderActive() {
 
 /* ── Header KPIs ── */
 function renderHeader() {
-  const total    = activeCRM.length;
-  const ativos   = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
-  const assin    = activeCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia').length;
-  const fechados = getFechadosFiltered().length;
-  document.getElementById('hk-total').textContent       = total    || '--';
-  document.getElementById('hk-ativos').textContent      = ativos   || '--';
-  document.getElementById('hk-assinaturas').textContent = assin    || '--';
-  document.getElementById('hk-fechados').textContent    = fechados || '--';
+  const total  = activeCRM.length;
+  const ativos = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
+  const assin  = activeCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia').length;
+  document.getElementById('hk-total').textContent       = total  || '--';
+  document.getElementById('hk-ativos').textContent      = ativos || '--';
+  document.getElementById('hk-assinaturas').textContent = assin  || '--';
 }
 
 /* ── helpers de campo ── */
@@ -2152,7 +2145,7 @@ function getAdsField(row, idx) {
 
 function renderADS() {
   if (!rawADS.length) {
-    ['ads-invest','ads-cpl','ads-leads','ads-ativas'].forEach(id => {
+    ['ads-invest','ads-cpl','ads-leads','ads-fechados'].forEach(id => {
       document.getElementById(id).textContent = '--';
     });
     document.getElementById('ads-campanhas-container').innerHTML =
@@ -2208,13 +2201,13 @@ function renderADS() {
   );
   const totalInvest = list.reduce((s, [, d]) => s + d.valor, 0);
   const totalLeads  = list.reduce((s, [, d]) => s + d.leads, 0);
-  const ativas      = list.filter(([, d]) => d.ativa).length;
-  const cplGeral    = totalLeads > 0 ? totalInvest / totalLeads : 0;
+  const cplGeral  = totalLeads > 0 ? totalInvest / totalLeads : 0;
+  const fechadosN = getFechadosFiltered().length;
 
-  document.getElementById('ads-invest').textContent = fmtBRL(totalInvest);
-  document.getElementById('ads-cpl').textContent    = totalLeads > 0 ? fmtBRL2(cplGeral) : '--';
-  document.getElementById('ads-leads').textContent  = totalLeads;
-  document.getElementById('ads-ativas').textContent = ativas;
+  document.getElementById('ads-invest').textContent   = fmtBRL(totalInvest);
+  document.getElementById('ads-cpl').textContent      = totalLeads > 0 ? fmtBRL2(cplGeral) : '--';
+  document.getElementById('ads-leads').textContent    = totalLeads;
+  document.getElementById('ads-fechados').textContent = fechadosN || '--';
 
   /* Campanhas paginadas */
   adsCampanhasData = list;
