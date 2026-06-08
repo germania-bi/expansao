@@ -946,7 +946,7 @@ body { background: var(--bg); color: var(--txt); }
       <div class="mkpi">
         <div class="mkpi-v" id="exp-assin">--</div>
         <div class="mkpi-l">Assinaturas</div>
-        <div class="mkpi-sub">Contratos assinados</div>
+        <div class="mkpi-sub" id="exp-assin-valor">Contratos assinados</div>
       </div>
     </div>
 
@@ -1489,6 +1489,21 @@ function normalizeDataCriacao(row) {
   return getField(row, 'Data de criação', 'Data de criacao', 'data de criação').trim();
 }
 
+function normalizeTelefone(row) {
+  return getField(row, 'Telefone', 'telefone').trim();
+}
+
+function normalizeValorUnico(row) {
+  const s = getField(row, 'Valor Único', 'Valor Unico', 'valor único', 'valor unico').trim();
+  if (!s) return 0;
+  const cleaned = s.replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
+  return parseFloat(cleaned) || 0;
+}
+
+function normalizeProdutos(row) {
+  return getField(row, 'Produtos', 'produtos').trim();
+}
+
 /* ══════════════════════════════════════════════
    TAB 1: VISÃO GERAL
 ══════════════════════════════════════════════ */
@@ -1796,10 +1811,16 @@ function renderExpansao() {
     ? Math.round(arr.reduce((s, r) => s + diasNoPipeline(normalizeDataCriacao(r)), 0) / arr.length)
     : null;
 
+  const valorContratado = expRows
+    .filter(r => normalizeEtapa(r) === 'Assinatura do Contrato da Franquia')
+    .reduce((s, r) => s + normalizeValorUnico(r), 0);
+
   document.getElementById('exp-total').textContent   = expRows.length || '--';
   document.getElementById('exp-dias-cc').textContent = avg(cc) !== null ? avg(cc) + 'd' : '--';
   document.getElementById('exp-dias-ap').textContent = avg(ap) !== null ? avg(ap) + 'd' : '--';
   document.getElementById('exp-assin').textContent   = assin;
+  document.getElementById('exp-assin-valor').textContent =
+    valorContratado > 0 ? fmtBRL(valorContratado) : 'Contratos assinados';
 
   /* Alert box Outros */
   const perdaExp = activeCRM.filter(r =>
@@ -1822,7 +1843,10 @@ function renderExpansao() {
     etapa: normalizeEtapa(r),
     resp:  normalizeResp(r),
     dias:  diasNoPipeline(normalizeDataCriacao(r)),
+    valor: normalizeValorUnico(r),
   })).sort((a, b) => b.dias - a.dias);
+
+  const temValor = ativosEtapas.some(i => i.valor > 0);
 
   if (ativosEtapas.length) {
     const rows_html = ativosEtapas.map(item => `
@@ -1830,12 +1854,15 @@ function renderExpansao() {
         <td>${esc(item.nome)}</td>
         <td>${esc(item.etapa)}</td>
         <td>${esc(item.resp)}</td>
+        ${temValor ? `<td class="right">${item.valor > 0 ? fmtBRL(item.valor) : '—'}</td>` : ''}
         <td class="right"><span class="badge-dias ${classeDias(item.dias)}">${item.dias}d</span></td>
       </tr>`).join('');
     document.getElementById('exp-ativos-container').innerHTML = `
       <table class="ez-table">
         <thead><tr>
-          <th>Nome</th><th>Etapa</th><th>Responsável</th><th class="right">Dias</th>
+          <th>Nome</th><th>Etapa</th><th>Responsável</th>
+          ${temValor ? '<th class="right">Valor</th>' : ''}
+          <th class="right">Dias</th>
         </tr></thead>
         <tbody>${rows_html}</tbody>
       </table>`;
