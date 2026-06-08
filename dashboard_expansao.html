@@ -2282,13 +2282,16 @@ function renderAdsCampanhas(page) {
 }
 
 function stripBrackets(str) {
-  return str.replace(/\[.*?\]\s*/g, '').trim();
+  return str.replace(/\[turma\]\s*/gi, '').trim();
 }
 
 function renderCplChart(list) {
   const data = list
     .filter(([, d]) => d.leads > 0)
-    .map(([nome, d]) => ({ nome: nome.length > 38 ? nome.slice(0, 38) + '…' : nome, cpl: d.valor / d.leads }))
+    .map(([nome, d]) => {
+      const clean = stripBrackets(nome);
+      return { nome: clean.length > 32 ? clean.slice(0, 32) + '…' : clean, cpl: d.valor / d.leads };
+    })
     .slice(0, 10);
 
   if (!data.length) {
@@ -2302,20 +2305,20 @@ function renderCplChart(list) {
 
   const cplContainer = document.getElementById('ads-cpl-chart');
   const cplW    = (cplContainer && cplContainer.offsetWidth > 200) ? cplContainer.offsetWidth - 8 : 500;
-  const valW    = 72;
-  const nameW   = Math.min(200, Math.round(cplW * 0.36));
-  const barMaxW = cplW - valW - nameW - 24;
+  const labelW  = Math.min(220, Math.round(cplW * 0.40));
+  const valW    = 80;
+  const barMaxW = cplW - labelW - valW - 16;
   const totalW  = cplW;
 
   const bars = data.map((item, i) => {
     const y  = i * (barH + gap);
     const bw = Math.max(4, Math.round((item.cpl / maxCpl) * barMaxW));
     return `
-      <rect x="0" y="${y}" width="${bw}" height="${barH}" rx="3" fill="#C8941A" opacity="0.85"/>
-      <text x="${bw + 8}" y="${y + barH / 2 + 4}"
-        font-family="Barlow Condensed,sans-serif" font-size="13" font-weight="700" fill="var(--gold)">${fmtBRL2(item.cpl)}</text>
-      <text x="${totalW}" y="${y + barH / 2 + 4}" text-anchor="end"
-        font-family="Barlow Condensed,sans-serif" font-size="12" fill="var(--txt-faint)">${esc(item.nome)}</text>`;
+      <text x="${labelW - 8}" y="${y + barH / 2 + 4}" text-anchor="end"
+        font-family="Barlow Condensed,sans-serif" font-size="12" fill="var(--txt-faint)">${esc(item.nome)}</text>
+      <rect x="${labelW}" y="${y}" width="${bw}" height="${barH}" rx="3" fill="#C8941A" opacity="0.85"/>
+      <text x="${labelW + bw + 8}" y="${y + barH / 2 + 4}"
+        font-family="Barlow Condensed,sans-serif" font-size="13" font-weight="700" fill="var(--gold)">${fmtBRL2(item.cpl)}</text>`;
   }).join('');
 
   document.getElementById('ads-cpl-chart').innerHTML = `
