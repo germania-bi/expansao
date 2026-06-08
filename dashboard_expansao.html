@@ -1848,8 +1848,7 @@ function renderSDR() {
   const perdaSDR = activeCRM.filter(r => {
     if (normalizeEstado(r) !== 'Perdida') return false;
     const etapa = normalizeEtapa(r);
-    if (etapa === 'Perdidos') return isSDR(normalizeResp(r));
-    return ETAPAS_SDR.includes(etapa);
+    return etapa === 'Perdidos' || ETAPAS_SDR.includes(etapa);
   });
   renderMotivoPerda('sdr-perda-container', perdaSDR);
 
@@ -1951,12 +1950,9 @@ function renderExpansao() {
     valorContratado > 0 ? fmtBRL(valorContratado) : 'Contratos assinados';
 
   /* Alert box Outros */
-  const perdaExp = activeCRM.filter(r => {
-    if (normalizeEstado(r) !== 'Perdida') return false;
-    const etapa = normalizeEtapa(r);
-    if (etapa === 'Perdidos') return !isSDR(normalizeResp(r));
-    return ETAPAS_EXP.includes(etapa);
-  });
+  const perdaExp = activeCRM.filter(r =>
+    normalizeEstado(r) === 'Perdida' && ETAPAS_EXP.includes(normalizeEtapa(r))
+  );
   const outros   = perdaExp.filter(r => {
     const m = normalizeMotivo(r).toLowerCase();
     return m === 'outros' || m === 'nada' || m === '';
