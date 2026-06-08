@@ -669,12 +669,23 @@ body { background: var(--bg); color: var(--txt); }
 .btn-sh:hover { background: var(--card-bg); color: var(--gold-lt); border-color: var(--gold); z-index: 1; position: relative; }
 .btn-sh.active { background: var(--red); border-color: var(--red); color: #fff; border-right-width: 0.8px; z-index: 2; position: relative; }
 .btn-sh.active + .btn-sh { border-left-width: 0; }
-/* count label */
-.f-count {
+/* limpar button */
+.btn-limpar {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: transparent;
+  border: 0.8px solid var(--border);
+  border-radius: 4px;
   color: var(--txt-faint);
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
 }
+.btn-limpar:hover { color: var(--gold); border-color: rgba(255,166,44,0.4); }
 /* ── Flatpickr overrides ── */
 .flatpickr-calendar {
   background: var(--bg2) !important;
@@ -791,15 +802,7 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
         </div>
       </div>
     </div>
-    <div class="h-actions">
-      <span class="last-updated" id="last-updated"></span>
-      <label class="dark-toggle" onclick="toggleDark()" title="Alternar tema">
-        <span class="dark-toggle-lbl" id="dark-lbl">Claro</span>
-        <span class="dark-toggle-track">
-          <span class="dark-toggle-thumb"></span>
-        </span>
-      </label>
-    </div>
+    <span class="last-updated" id="last-updated" style="margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:rgba(255,230,200,0.4);"></span>
   </div>
 </header>
 
@@ -844,7 +847,11 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       <button class="btn-sh" id="fc-tri"     onclick="setShortcut('quarter',this)">Tri</button>
       <button class="btn-sh" id="fc-tudo"    onclick="setShortcut('all',this)">Tudo</button>
     </div>
-    <span class="f-count" id="f-count"></span>
+    <button class="btn-limpar" id="btn-limpar" onclick="setShortcut('all',document.getElementById('fc-tudo'))">× Limpar</button>
+    <label class="dark-toggle" onclick="toggleDark()" title="Alternar tema" style="margin-left:auto">
+      <span class="dark-toggle-lbl" id="dark-lbl-bar">Claro</span>
+      <span class="dark-toggle-track"><span class="dark-toggle-thumb"></span></span>
+    </label>
   </div>
 </div>
 
@@ -1496,7 +1503,9 @@ function toggleDark() {
   const next = cur === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('germania-dark-expansao', next);
-  document.getElementById('dark-lbl').textContent = next === 'dark' ? 'Claro' : 'Escuro';
+  const lbl = next === 'dark' ? 'Claro' : 'Escuro';
+  const el = document.getElementById('dark-lbl-bar');
+  if (el) el.textContent = lbl;
 }
 
 /* ══════════════════════════════════════════════
@@ -1529,13 +1538,6 @@ function renderHeader() {
   document.getElementById('hk-ativos').textContent      = ativos || '--';
   document.getElementById('hk-assinaturas').textContent = assin  || '--';
 
-  /* contador de filtro */
-  const countEl = document.getElementById('f-count');
-  if (countEl) {
-    countEl.textContent = (filtroAtivo !== 'tudo' && rawCRM.length)
-      ? `· ${activeCRM.length} de ${rawCRM.length} leads`
-      : '';
-  }
 }
 
 /* ── helpers de campo ── */
@@ -2219,7 +2221,8 @@ function renderFontesCRM() {
   /* Restaurar tema */
   const theme = localStorage.getItem('germania-dark-expansao') || 'dark';
   document.documentElement.setAttribute('data-theme', theme);
-  document.getElementById('dark-lbl').textContent = theme === 'dark' ? 'Claro' : 'Escuro';
+  const darkLbl = document.getElementById('dark-lbl-bar');
+  if (darkLbl) darkLbl.textContent = theme === 'dark' ? 'Claro' : 'Escuro';
 
   /* Inicializar Flatpickr */
   if (typeof flatpickr !== 'undefined') initFlatpickr();
