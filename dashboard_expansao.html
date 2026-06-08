@@ -1924,9 +1924,7 @@ function renderPipelineAtivo(containerId, allRows, etapas) {
 ══════════════════════════════════════════════ */
 
 function renderExpansao() {
-  /* Expansão usa rawCRM — o filtro de data não se aplica aqui porque
-     "entrou na expansão" ≠ "foi criado no período" */
-  const expRows = rawCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
+  const expRows = activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
   const ativos  = expRows.filter(r => normalizeEstado(r) === 'Em Andamento');
   const assin   = expRows.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia').length;
 
