@@ -464,6 +464,16 @@ body { background: var(--bg); color: var(--txt); }
   margin-top: 8px;
   font-style: italic;
 }
+.bar-list { padding: 4px 0; }
+.bar-row { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.bar-row:last-child { border-bottom: none; }
+.bar-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.bar-label span { font-size: 13px; color: var(--txt); }
+.bar-label strong { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700; color: var(--gold); line-height: 1; }
+.bar-track { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.4s ease; }
+.bar-sub { font-size: 11px; color: var(--txt-faint); margin-top: 4px; }
+
 .pag-controls {
   display: flex;
   align-items: center;
@@ -1073,12 +1083,7 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
           <div class="c-title">Leads Ativos — Dias no Pipeline</div>
           <div class="c-sub">Contato Comercial e Apresentação · ordenado por mais antigo</div>
         </div>
-        <select id="exp-dias-filtro" onchange="expAtivosDiasMin=+this.value;expAtivosPage=0;renderExpAtivos(0)" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;background:var(--bg3);color:var(--txt);border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer">
-          <option value="0">Todos os dias</option>
-          <option value="30">&gt; 30 dias</option>
-          <option value="60">&gt; 60 dias</option>
-          <option value="90">&gt; 90 dias</option>
-        </select>
+        <button id="exp-ativos-sort" class="btn-pag" onclick="expAtivosAsc=!expAtivosAsc;expAtivosPage=0;renderExpAtivos(0)" style="white-space:nowrap">↓ Mais antigo</button>
       </div>
       <div id="exp-ativos-container">
         <div class="empty-state">Aguardando dados...</div>
@@ -1234,6 +1239,7 @@ let activeADS   = [];
 let expAtivosData  = [];
 let expAtivosPage  = 0;
 let expAtivosDiasMin = 0;
+let expAtivosAsc   = false;
 let fpFrom, fpTo;
 
 function computeFilteredCRM() {
@@ -1938,21 +1944,19 @@ function renderPipelineAtivo(containerId, allRows, etapas) {
     const e = normalizeEtapa(r);
     if (counts[e] !== undefined) counts[e]++;
   });
+  const maxVal = Math.max(...etapas.map(e => counts[e]), 1);
 
-  const rows_html = etapas.map(e => `
-    <tr>
-      <td>${esc(e)}</td>
-      <td class="right"><strong>${counts[e]}</strong></td>
-    </tr>`).join('');
+  const rows_html = etapas.map(e => {
+    const n = counts[e];
+    const pct = ((n / maxVal) * 100).toFixed(1);
+    return `
+    <div class="bar-row">
+      <div class="bar-label"><span>${esc(e)}</span><strong>${n}</strong></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
 
-  document.getElementById(containerId).innerHTML = `
-    <table class="ez-table">
-      <thead><tr>
-        <th>Etapa</th>
-        <th class="right">Leads Ativos</th>
-      </tr></thead>
-      <tbody>${rows_html}</tbody>
-    </table>`;
+  document.getElementById(containerId).innerHTML = `<div class="bar-list">${rows_html}</div>`;
 }
 
 /* ══════════════════════════════════════════════
@@ -2053,17 +2057,21 @@ function renderExpansao() {
 
 function renderExpAtivos(page) {
   expAtivosPage = page;
-  const minDias = expAtivosDiasMin || 0;
-  const filtered = expAtivosData.filter(i => i.dias >= minDias);
+  const sorted = expAtivosAsc
+    ? [...expAtivosData].sort((a, b) => a.dias - b.dias)
+    : [...expAtivosData].sort((a, b) => b.dias - a.dias);
   const perPage  = 10;
-  const total    = filtered.length;
+  const total    = sorted.length;
   const totalPag = Math.ceil(total / perPage);
-  const items    = filtered.slice(page * perPage, (page + 1) * perPage);
+  const items    = sorted.slice(page * perPage, (page + 1) * perPage);
   const temValor = expAtivosData.some(i => i.valor > 0);
+
+  const btn = document.getElementById('exp-ativos-sort');
+  if (btn) btn.textContent = expAtivosAsc ? '↑ Mais novo' : '↓ Mais antigo';
 
   if (!total) {
     document.getElementById('exp-ativos-container').innerHTML =
-      '<div class="empty-state">Nenhum lead ativo com esse filtro.</div>';
+      '<div class="empty-state">Nenhum lead ativo nas etapas de expansão.</div>';
     return;
   }
 
@@ -2103,19 +2111,23 @@ function renderResponsaveis(containerId, rows) {
     if (normalizeEstado(r) === 'Perdida') map[resp].perdidos++;
   });
   const sorted = Object.entries(map).sort((a, b) => b[1].total - a[1].total);
-  const rows_html = sorted.map(([resp, d]) => `
-    <tr>
-      <td>${esc(resp)}</td>
-      <td class="right">${d.total}</td>
-      <td class="right">${d.perdidos}</td>
-    </tr>`).join('');
-  document.getElementById(containerId).innerHTML = `
-    <table class="ez-table">
-      <thead><tr>
-        <th>Responsável</th><th class="right">Total</th><th class="right">Perdidos</th>
-      </tr></thead>
-      <tbody>${rows_html}</tbody>
-    </table>`;
+  const maxVal = Math.max(...sorted.map(([, d]) => d.total), 1);
+
+  const rows_html = sorted.map(([resp, d]) => {
+    const pct = ((d.total / maxVal) * 100).toFixed(1);
+    const pctPerd = d.total > 0 ? ((d.perdidos / d.total) * 100).toFixed(0) : 0;
+    return `
+    <div class="bar-row">
+      <div class="bar-label">
+        <span>${esc(resp)}</span>
+        <strong>${d.total}</strong>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="bar-sub">${d.perdidos} perdido${d.perdidos !== 1 ? 's' : ''} &nbsp;·&nbsp; ${pctPerd}%</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById(containerId).innerHTML = `<div class="bar-list">${rows_html}</div>`;
 }
 
 /* ══════════════════════════════════════════════
