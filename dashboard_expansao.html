@@ -497,6 +497,8 @@ body { background: var(--bg); color: var(--txt); }
 }
 .btn-pag:hover:not(:disabled) { background: var(--card-bg); }
 .btn-pag:disabled { opacity: 0.35; cursor: default; }
+.btn-pag-active { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+.btn-pag-active:hover { background: var(--gold-lt); }
 .pag-info {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 12px;
@@ -843,6 +845,11 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
           <div class="hk-v" id="hk-assinaturas">--</div>
           <div class="hk-sub" id="hk-assinaturas-sub">franquias fechadas</div>
         </div>
+        <div class="hk">
+          <div class="hk-l">Fechados</div>
+          <div class="hk-v" id="hk-fechados" style="color:var(--green)">--</div>
+          <div class="hk-sub" id="hk-fechados-sub">no período</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1161,36 +1168,30 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
 
     <!-- Tabela de campanhas -->
     <div class="card">
-      <div class="card-header">
-        <div class="c-title">Campanhas</div>
-        <div class="c-sub">Agrupado por campanha · ordenado por investimento</div>
+      <div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div>
+          <div class="c-title">Campanhas</div>
+          <div class="c-sub">Ativas sempre no topo · ordenado por investimento</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button id="fcads-todas"      class="btn-pag btn-pag-active" onclick="adsCampanhasFilter='all';adsCampanhasPage=0;renderAdsCampanhas(0)">Todas</button>
+          <button id="fcads-ativas"     class="btn-pag" onclick="adsCampanhasFilter='ativas';adsCampanhasPage=0;renderAdsCampanhas(0)">Ativas</button>
+          <button id="fcads-encerradas" class="btn-pag" onclick="adsCampanhasFilter='encerradas';adsCampanhasPage=0;renderAdsCampanhas(0)">Encerradas</button>
+        </div>
       </div>
       <div id="ads-campanhas-container">
         <div class="empty-state">Aguardando dados...</div>
       </div>
     </div>
 
-    <div class="grid-2">
-      <!-- CPL por campanha (barras) -->
-      <div class="card">
-        <div class="card-header">
-          <div class="c-title">CPL por Campanha</div>
-          <div class="c-sub">Custo por lead em cada campanha</div>
-        </div>
-        <div id="ads-cpl-chart">
-          <div class="empty-state">Aguardando dados...</div>
-        </div>
+    <!-- CPL por campanha (barras) — full width -->
+    <div class="card">
+      <div class="card-header">
+        <div class="c-title">CPL por Campanha</div>
+        <div class="c-sub">Custo por lead em cada campanha</div>
       </div>
-
-      <!-- Leads por fonte (CRM) -->
-      <div class="card">
-        <div class="card-header">
-          <div class="c-title">Leads por Fonte (CRM)</div>
-          <div class="c-sub">Coluna Fonte da base CRM</div>
-        </div>
-        <div id="ads-fontes-container">
-          <div class="empty-state">Aguardando dados...</div>
-        </div>
+      <div id="ads-cpl-chart">
+        <div class="empty-state">Aguardando dados...</div>
       </div>
     </div>
 
@@ -1240,6 +1241,9 @@ let expAtivosData  = [];
 let expAtivosPage  = 0;
 let expAtivosDiasMin = 0;
 let expAtivosAsc   = false;
+let adsCampanhasData   = [];
+let adsCampanhasPage   = 0;
+let adsCampanhasFilter = 'all';
 let fpFrom, fpTo;
 
 function computeFilteredCRM() {
@@ -1571,13 +1575,14 @@ function renderActive() {
 
 /* ── Header KPIs ── */
 function renderHeader() {
-  const total  = activeCRM.length;
-  const ativos = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
-  const assin  = activeCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia').length;
-  document.getElementById('hk-total').textContent       = total  || '--';
-  document.getElementById('hk-ativos').textContent      = ativos || '--';
-  document.getElementById('hk-assinaturas').textContent = assin  || '--';
-
+  const total    = activeCRM.length;
+  const ativos   = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
+  const assin    = activeCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia').length;
+  const fechados = getFechadosFiltered().length;
+  document.getElementById('hk-total').textContent       = total    || '--';
+  document.getElementById('hk-ativos').textContent      = ativos   || '--';
+  document.getElementById('hk-assinaturas').textContent = assin    || '--';
+  document.getElementById('hk-fechados').textContent    = fechados || '--';
 }
 
 /* ── helpers de campo ── */
@@ -1964,9 +1969,10 @@ function renderPipelineAtivo(containerId, allRows, etapas) {
 ══════════════════════════════════════════════ */
 
 function renderExpansao() {
-  const expRows = activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
-  const ativos  = expRows.filter(r => normalizeEstado(r) === 'Em Andamento');
-  const assin   = expRows.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia').length;
+  const expRows  = activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
+  const ativos   = expRows.filter(r => normalizeEstado(r) === 'Em Andamento');
+  const fechadosExp = getFechadosFiltered();
+  const assin    = fechadosExp.length;
 
   /* Média de dias por etapa */
   const cc = ativos.filter(r => normalizeEtapa(r) === 'Contato Comercial');
@@ -1976,9 +1982,7 @@ function renderExpansao() {
     ? Math.round(arr.reduce((s, r) => s + diasNoPipeline(normalizeDataCriacao(r)), 0) / arr.length)
     : null;
 
-  const valorContratado = expRows
-    .filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia')
-    .reduce((s, r) => s + normalizeValorUnico(r), 0);
+  const valorContratado = fechadosExp.reduce((s, r) => s + normalizeValorUnico(r), 0);
 
   document.getElementById('exp-total').textContent   = expRows.length || '--';
   document.getElementById('exp-dias-cc').textContent = avg(cc) !== null ? avg(cc) + 'd' : '--';
@@ -2147,7 +2151,6 @@ function renderADS() {
     document.getElementById('ads-campanhas-container').innerHTML =
       '<div class="empty-state">Sem dados de ADS. Verifique a URL.</div>';
     document.getElementById('ads-cpl-chart').innerHTML = '';
-    document.getElementById('ads-fontes-container').innerHTML = '';
     return;
   }
 
@@ -2193,7 +2196,9 @@ function renderADS() {
     if (veic === 'active') campanhas[nome].ativa = true;
   });
 
-  const list = Object.entries(campanhas).sort((a, b) => b[1].valor - a[1].valor);
+  const list = Object.entries(campanhas).sort((a, b) =>
+    (b[1].ativa ? 1 : 0) - (a[1].ativa ? 1 : 0) || b[1].valor - a[1].valor
+  );
   const totalInvest = list.reduce((s, [, d]) => s + d.valor, 0);
   const totalLeads  = list.reduce((s, [, d]) => s + d.leads, 0);
   const ativas      = list.filter(([, d]) => d.ativa).length;
@@ -2204,9 +2209,44 @@ function renderADS() {
   document.getElementById('ads-leads').textContent  = totalLeads;
   document.getElementById('ads-ativas').textContent = ativas;
 
-  /* Tabela campanhas */
-  const tRows = list.map(([nome, d]) => {
-    const cpl  = d.leads > 0 ? fmtBRL2(d.valor / d.leads) : '--';
+  /* Campanhas paginadas */
+  adsCampanhasData = list;
+  adsCampanhasPage = 0;
+  renderAdsCampanhas(0);
+
+  /* Gráfico CPL por campanha */
+  renderCplChart(list);
+}
+
+function renderAdsCampanhas(page) {
+  adsCampanhasPage = page;
+  const f = adsCampanhasFilter;
+
+  const filtered = adsCampanhasData.filter(([, d]) =>
+    f === 'all' ? true : f === 'ativas' ? d.ativa : !d.ativa
+  );
+
+  const perPage  = 4;
+  const total    = filtered.length;
+  const totalPag = Math.ceil(total / perPage);
+  const items    = filtered.slice(page * perPage, (page + 1) * perPage);
+
+  /* Destacar botão ativo */
+  ['todas','ativas','encerradas'].forEach(k => {
+    const btn = document.getElementById('fcads-' + k);
+    if (btn) btn.className = 'btn-pag' + (
+      (k === 'todas' && f === 'all') || k === f ? ' btn-pag-active' : ''
+    );
+  });
+
+  if (!total) {
+    document.getElementById('ads-campanhas-container').innerHTML =
+      '<div class="empty-state">Nenhuma campanha com esse filtro.</div>';
+    return;
+  }
+
+  const tRows = items.map(([nome, d]) => {
+    const cpl   = d.leads > 0 ? fmtBRL2(d.valor / d.leads) : '--';
     const label = nome.length > 40 ? nome.slice(0, 40) + '…' : nome;
     const status = d.ativa
       ? '<span class="chip chip-active">Ativa</span>'
@@ -2220,6 +2260,13 @@ function renderADS() {
     </tr>`;
   }).join('');
 
+  const pag = totalPag > 1 ? `
+    <div class="pag-controls">
+      <button class="btn-pag" ${page === 0 ? 'disabled' : ''} onclick="renderAdsCampanhas(${page - 1})">← Ant</button>
+      <span class="pag-info">${page + 1} / ${totalPag} &nbsp;·&nbsp; ${total} campanhas</span>
+      <button class="btn-pag" ${page === totalPag - 1 ? 'disabled' : ''} onclick="renderAdsCampanhas(${page + 1})">Próx →</button>
+    </div>` : '';
+
   document.getElementById('ads-campanhas-container').innerHTML = `
     <table class="ez-table">
       <thead><tr>
@@ -2230,13 +2277,7 @@ function renderADS() {
         <th>Status</th>
       </tr></thead>
       <tbody>${tRows}</tbody>
-    </table>`;
-
-  /* Gráfico CPL por campanha */
-  renderCplChart(list);
-
-  /* Leads por fonte (CRM) */
-  renderFontesCRM();
+    </table>${pag}`;
 }
 
 function renderCplChart(list) {
