@@ -1031,19 +1031,14 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       </div>
     </div>
 
-    <!-- Ritmo semanal SDR -->
+    <!-- Qualificação por semana -->
     <div class="card">
       <div class="card-header">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div class="c-title">Ritmo Diário — Leads SDR</div>
-            <div class="c-sub">Leads recebidos por dia · data de criação</div>
-          </div>
-          <div class="chart-legend" id="leg-sdr-semanal"></div>
-        </div>
+        <div class="c-title">Qualificação por Semana</div>
+        <div class="c-sub">Leads encaminhados à Expansão · agrupado pela semana de entrada no CRM</div>
       </div>
-      <div class="chart-canvas-wrap"><canvas id="canvas-sdr-semanal"></canvas></div>
-      <div id="sdr-semanal-container" style="display:none">
+      <div class="chart-canvas-wrap"><canvas id="canvas-sdr-qualif"></canvas></div>
+      <div id="sdr-qualif-container" style="display:none">
         <div class="empty-state">Aguardando dados...</div>
       </div>
     </div>
@@ -1917,7 +1912,92 @@ function renderSDR() {
     ETAPAS_SDR
   );
 
-  renderTimeline('sdr-semanal-container', activeCRM);
+  renderQualifPorSemana();
+}
+
+function renderQualifPorSemana() {
+  const canvas = document.getElementById('canvas-sdr-qualif');
+  if (!canvas) return;
+
+  if (chartInstances['sdr-qualif-container']) {
+    chartInstances['sdr-qualif-container'].destroy();
+    delete chartInstances['sdr-qualif-container'];
+  }
+
+  /* leads qualificados = todos que estão em etapas de Expansão */
+  const qualif = rawCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
+
+  /* agrupar pela segunda-feira da semana de criação */
+  const weekCounts = {};
+  qualif.forEach(r => {
+    const d = parseDate(normalizeDataCriacao(r));
+    if (!d) return;
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    const mon = new Date(d); mon.setDate(diff);
+    const key = mon.toISOString().slice(0, 10);
+    weekCounts[key] = (weekCounts[key] || 0) + 1;
+  });
+
+  const sorted = Object.entries(weekCounts).sort((a, b) => a[0].localeCompare(b[0]));
+
+  if (!sorted.length) {
+    canvas.style.display = 'none';
+    return;
+  }
+  canvas.style.display = '';
+
+  const labels = sorted.map(([k]) => {
+    const [, m, d] = k.split('-');
+    return `${d}/${m}`;
+  });
+  const data = sorted.map(([, v]) => v);
+
+  chartInstances['sdr-qualif-container'] = new Chart(canvas, {
+    type: 'bar',
+    plugins: [ChartDataLabels],
+    data: {
+      labels,
+      datasets: [{
+        label: 'Qualificados',
+        data,
+        backgroundColor: 'rgba(200,148,26,0.75)',
+        borderColor: '#C8941A',
+        borderWidth: 1,
+        borderRadius: 4,
+        datalabels: {
+          anchor: 'end', align: 'top', offset: 2,
+          color: 'rgba(241,227,206,0.55)',
+          font: { family: 'Barlow Condensed', size: 10, weight: '600' },
+          formatter: v => v > 0 ? v : '',
+        },
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1A1208',
+          titleColor: '#C8941A',
+          bodyColor: '#F1E3CE',
+          callbacks: { title: items => 'Semana de ' + items[0].label }
+        },
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,200,120,0.06)' },
+          ticks: { color: 'rgba(241,227,206,0.5)', font: { family: 'Barlow Condensed', size: 11 } },
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(255,200,120,0.06)' },
+          ticks: { color: 'rgba(241,227,206,0.5)', font: { family: 'Barlow Condensed', size: 11 }, stepSize: 1 },
+        },
+      },
+    },
+  });
 }
 
 function renderMotivoPerda(containerId, rows) {
