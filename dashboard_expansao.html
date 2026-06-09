@@ -377,6 +377,8 @@ body { background: var(--bg); color: var(--txt); }
 }
 .ez-table tr:last-child td { border-bottom: none; }
 .ez-table tr:hover td { background: rgba(255,166,44,0.04); }
+.ez-table.ez-table-camps td:first-child { width: 100%; }
+.ez-table .num-col { white-space: nowrap; width: 1%; }
 .ez-table .highlight-red td { color: var(--red); font-weight: 600; }
 
 /* ══════════════════════════════════════════════
@@ -2322,7 +2324,7 @@ function renderAdsCampanhas(page) {
     f === 'all' ? true : f === 'ativas' ? d.ativa : !d.ativa
   );
 
-  const perPage  = 4;
+  const perPage  = 6;
   const total    = filtered.length;
   const totalPag = Math.ceil(total / perPage);
   const items    = filtered.slice(page * perPage, (page + 1) * perPage);
@@ -2342,18 +2344,18 @@ function renderAdsCampanhas(page) {
   }
 
   const tRows = items.map(([nome, d]) => {
-    const cpl   = d.leads > 0 ? fmtBRL2(d.valor / d.leads) : '--';
-    const clean = stripBrackets(nome);
-    const label = clean.length > 40 ? clean.slice(0, 40) + '…' : clean;
+    const cplVal = d.leads > 0 ? d.valor / d.leads : null;
+    const cpl    = cplVal !== null ? fmtBRL2(cplVal) : '--';
+    const clean  = stripBrackets(nome);
     const status = d.ativa
       ? '<span class="chip chip-active">Ativa</span>'
       : '<span class="chip chip-paused">Encerrada</span>';
     return `<tr>
-      <td title="${esc(nome)}">${esc(label)}</td>
-      <td class="right">${Math.round(d.leads)}</td>
-      <td class="right">${fmtBRL(d.valor)}</td>
-      <td class="right">${cpl}</td>
-      <td>${status}</td>
+      <td>${esc(clean)}</td>
+      <td class="right num-col">${Math.round(d.leads)}</td>
+      <td class="right num-col">${fmtBRL(d.valor)}</td>
+      <td class="right num-col">${cpl}</td>
+      <td class="num-col">${status}</td>
     </tr>`;
   }).join('');
 
@@ -2365,12 +2367,12 @@ function renderAdsCampanhas(page) {
     </div>` : '';
 
   document.getElementById('ads-campanhas-container').innerHTML = `
-    <table class="ez-table">
+    <table class="ez-table ez-table-camps">
       <thead><tr>
         <th>Campanha</th>
-        <th class="right">Leads</th>
-        <th class="right">Investimento</th>
-        <th class="right">CPL</th>
+        <th class="right num-col">Leads</th>
+        <th class="right num-col">Investimento</th>
+        <th class="right num-col">CPL</th>
         <th>Status</th>
       </tr></thead>
       <tbody>${tRows}</tbody>
@@ -2396,6 +2398,7 @@ function renderCplChart(list) {
   }
 
   const maxCpl = Math.max(...data.map(d => d.cpl), 1);
+  const avgCpl = data.reduce((s, d) => s + d.cpl, 0) / data.length;
   const barH = 26, gap = 10;
   const svgH = data.length * (barH + gap);
 
@@ -2406,20 +2409,30 @@ function renderCplChart(list) {
   const barMaxW = cplW - labelW - valW - 16;
   const totalW  = cplW;
 
+  /* cor por faixa relativa à média: verde ≤80%, âmbar ≤120%, vermelho >120% */
+  const cplColor = cpl => cpl <= avgCpl * 0.8 ? '#4CAF7D' : cpl <= avgCpl * 1.2 ? '#C8941A' : '#C92B1E';
+
   const bars = data.map((item, i) => {
-    const y  = i * (barH + gap);
-    const bw = Math.max(4, Math.round((item.cpl / maxCpl) * barMaxW));
+    const y    = i * (barH + gap);
+    const bw   = Math.max(4, Math.round((item.cpl / maxCpl) * barMaxW));
+    const fill = cplColor(item.cpl);
+    const labelFill = fill === '#4CAF7D' ? '#4CAF7D' : fill === '#C92B1E' ? '#E05C52' : 'var(--gold)';
     return `
       <text x="4" y="${y + barH / 2 + 4}" text-anchor="start"
         font-family="Barlow Condensed,sans-serif" font-size="12" fill="var(--txt-faint)">${esc(item.nome)}</text>
-      <rect x="${labelW}" y="${y}" width="${bw}" height="${barH}" rx="3" fill="#C8941A" opacity="0.85"/>
+      <rect x="${labelW}" y="${y}" width="${bw}" height="${barH}" rx="3" fill="${fill}" opacity="0.85"/>
       <text x="${labelW + bw + 8}" y="${y + barH / 2 + 4}"
-        font-family="Barlow Condensed,sans-serif" font-size="13" font-weight="700" fill="var(--gold)">${fmtBRL2(item.cpl)}</text>`;
+        font-family="Barlow Condensed,sans-serif" font-size="13" font-weight="700" fill="${labelFill}">${fmtBRL2(item.cpl)}</text>`;
   }).join('');
 
   document.getElementById('ads-cpl-chart').innerHTML = `
     <div class="bar-chart-wrap">
       <svg width="${totalW}" height="${svgH + 10}" style="overflow:visible;display:block">${bars}</svg>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:10px;padding:0 4px">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#4CAF7D">● Eficiente ≤ ${fmtBRL2(avgCpl * 0.8)}</span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#C8941A">● Médio ≤ ${fmtBRL2(avgCpl * 1.2)}</span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#E05C52">● Caro > ${fmtBRL2(avgCpl * 1.2)}</span>
     </div>`;
 }
 
