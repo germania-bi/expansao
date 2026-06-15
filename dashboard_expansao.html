@@ -2098,9 +2098,7 @@ function renderExpansao() {
   );
 
   /* Tabela ativos com dias parados — paginada */
-  expAtivosData = ativos.filter(r =>
-    ['Contato Comercial', 'Apresentação do Projeto de Viabilidade'].includes(normalizeEtapa(r))
-  ).map(r => ({
+  expAtivosData = ativos.map(r => ({
     nome:  getField(r, 'Nome', 'nome') || 'Sem nome',
     etapa: normalizeEtapa(r),
     resp:  normalizeResp(r),
