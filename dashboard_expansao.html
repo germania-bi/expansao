@@ -859,8 +859,8 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
           <div class="hk-sub" id="hk-ativos-sub">em prospecção</div>
         </div>
         <div class="hk">
-          <div class="hk-l">Assinaturas</div>
-          <div class="hk-v" id="hk-assinaturas">--</div>
+          <div class="hk-l">Fechados</div>
+          <div class="hk-v" id="hk-assinaturas" style="color:var(--green)">--</div>
           <div class="hk-sub" id="hk-assinaturas-sub">franquias fechadas</div>
         </div>
       </div>
@@ -1592,10 +1592,13 @@ function renderActive() {
 function renderHeader() {
   const total  = activeCRM.length;
   const ativos = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
-  const assin  = activeCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia').length;
+  const fechadosHK = getFechadosFiltered();
+  const valorHK    = fechadosHK.reduce((s, r) => s + normalizeValorUnico(r), 0);
   document.getElementById('hk-total').textContent       = total  || '--';
   document.getElementById('hk-ativos').textContent      = ativos || '--';
-  document.getElementById('hk-assinaturas').textContent = assin  || '--';
+  document.getElementById('hk-assinaturas').textContent = fechadosHK.length || '--';
+  document.getElementById('hk-assinaturas-sub').textContent =
+    valorHK > 0 ? fmtBRL(valorHK) : 'franquias fechadas';
 }
 
 /* ── helpers de campo ── */
