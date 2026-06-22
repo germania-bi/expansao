@@ -1238,7 +1238,9 @@ const ADS_API = 'https://germania-ads-dashboard-production.up.railway.app';
 let rawCRM = [];
 let rawADS = [];
 let fetchErrors = [];
-let _adsCache = null; // { key: 'since|until', data: [] }
+let _adsCache  = null; // { key: 'since|until', data: [] }
+let _adsLoading = false;
+let _adsError   = false;
 const chartInstances = {};
 if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
 
@@ -1248,10 +1250,11 @@ function fmtYMD(d) {
 
 async function loadADSfromAPI() {
   const today = new Date();
-  const since = fmtYMD(filtroDe || new Date(2024, 0, 1)); // TUDO → desde jan/2024
+  const since = fmtYMD(filtroDe || new Date(2025, 0, 1)); // TUDO → desde jan/2025
   const until = fmtYMD(filtroAte ? new Date(Math.min(filtroAte.getTime(), today.getTime())) : today);
   const key   = since + '|' + until;
-  if (_adsCache?.key === key) { rawADS = _adsCache.data; return; }
+  if (_adsCache?.key === key) { rawADS = _adsCache.data; _adsLoading = false; _adsError = false; return; }
+  _adsLoading = true; _adsError = false;
   try {
     const res  = await fetch(ADS_API + '/api/campaigns?since=' + since + '&until=' + until);
     const json = await res.json();
@@ -1261,8 +1264,11 @@ async function loadADSfromAPI() {
     });
     rawADS = data;
     _adsCache = { key, data };
+    _adsLoading = false;
   } catch(e) {
     rawADS = [];
+    _adsLoading = false;
+    _adsError = true;
   }
 }
 
@@ -1332,6 +1338,11 @@ function setShortcut(type, el) {
 
 async function applyFiltro() {
   activeCRM = computeFilteredCRM();
+  // sinalizar loading nos KPIs de ADS enquanto busca
+  ['ads-invest','ads-cpl','ads-leads','ads-fechados'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '…';
+  });
   await loadADSfromAPI();
   activeADS = rawADS;
   renderAll();
@@ -2262,8 +2273,10 @@ function renderADS() {
     ['ads-invest','ads-cpl','ads-leads','ads-fechados'].forEach(id => {
       document.getElementById(id).textContent = '--';
     });
-    document.getElementById('ads-campanhas-container').innerHTML =
-      '<div class="empty-state">Sem dados de ADS para o período.</div>';
+    const msg = _adsError
+      ? '<div class="empty-state">Erro ao conectar à API de ADS. Tente novamente.</div>'
+      : '<div class="empty-state">Sem dados de ADS para o período.</div>';
+    document.getElementById('ads-campanhas-container').innerHTML = msg;
     document.getElementById('ads-cpl-chart').innerHTML = '';
     return;
   }
