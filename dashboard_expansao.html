@@ -1238,6 +1238,7 @@ const ADS_API = 'https://germania-ads-dashboard-production.up.railway.app';
 let rawCRM = [];
 let rawADS = [];
 let fetchErrors = [];
+let _adsCache = null; // { key: 'since|until', data: [] }
 const chartInstances = {};
 if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
 
@@ -1247,15 +1248,19 @@ function fmtYMD(d) {
 
 async function loadADSfromAPI() {
   const today = new Date();
-  const since = fmtYMD(filtroDe || new Date(today.getFullYear(), today.getMonth(), 1));
+  const since = fmtYMD(filtroDe || new Date(2024, 0, 1)); // TUDO → desde jan/2024
   const until = fmtYMD(filtroAte ? new Date(Math.min(filtroAte.getTime(), today.getTime())) : today);
+  const key   = since + '|' + until;
+  if (_adsCache?.key === key) { rawADS = _adsCache.data; return; }
   try {
     const res  = await fetch(ADS_API + '/api/campaigns?since=' + since + '&until=' + until);
     const json = await res.json();
-    rawADS = (json.data || []).filter(c => {
+    const data = (json.data || []).filter(c => {
       const n = c.name.toLowerCase();
       return n.includes('expan') || n.includes('troque de colarinho');
     });
+    rawADS = data;
+    _adsCache = { key, data };
   } catch(e) {
     rawADS = [];
   }
