@@ -1252,7 +1252,10 @@ async function loadADSfromAPI() {
   try {
     const res  = await fetch(ADS_API + '/api/campaigns?since=' + since + '&until=' + until);
     const json = await res.json();
-    rawADS = (json.data || []).filter(c => c.name.toLowerCase().includes('expan'));
+    rawADS = (json.data || []).filter(c => {
+      const n = c.name.toLowerCase();
+      return n.includes('expan') || n.includes('troque de colarinho');
+    });
   } catch(e) {
     rawADS = [];
   }
