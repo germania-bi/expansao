@@ -1161,13 +1161,13 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="ads-cpl">--</div>
-        <div class="mkpi-l">CPL Médio</div>
-        <div class="mkpi-sub">Investimento ÷ leads</div>
+        <div class="mkpi-l">CPC Médio</div>
+        <div class="mkpi-sub">Custo por clique</div>
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="ads-leads">--</div>
-        <div class="mkpi-l">Leads Gerados (ADS)</div>
-        <div class="mkpi-sub">Soma de resultados</div>
+        <div class="mkpi-l">Cliques (ADS)</div>
+        <div class="mkpi-sub">Campanhas de Expansão</div>
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="ads-fechados" style="color:var(--green)">--</div>
@@ -1197,8 +1197,8 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
     <!-- CPL por campanha (barras) — full width -->
     <div class="card">
       <div class="card-header">
-        <div class="c-title">CPL por Campanha</div>
-        <div class="c-sub">Custo por lead em cada campanha</div>
+        <div class="c-title">CPC por Campanha</div>
+        <div class="c-sub">Custo por clique em cada campanha</div>
       </div>
       <div id="ads-cpl-chart">
         <div class="empty-state">Aguardando dados...</div>
@@ -1231,8 +1231,8 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
 /* ─── URLs das planilhas — substituir antes do deploy ─── */
 const URLS = {
   crm: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFZGcNG9xe0T8D8NM1pKdE8WsLLDg3vIyUmtIxRkYrkvXDM-Z9dv542SQN_Z5JoKORlzvZF0mC0hNc/pub?output=csv',
-  ads: 'https://docs.google.com/spreadsheets/d/1PMJtt8Jsc1KnQJsTuaZWoBZrrxKw-wvEYcPNsa6mKP4/gviz/tq?tqx=out:csv&sheet=ads_germania',
 };
+const ADS_API = 'https://germania-ads-dashboard-production.up.railway.app';
 
 /* ─── Estado global ─── */
 let rawCRM = [];
@@ -1240,6 +1240,23 @@ let rawADS = [];
 let fetchErrors = [];
 const chartInstances = {};
 if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
+
+function fmtYMD(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+async function loadADSfromAPI() {
+  const today = new Date();
+  const since = fmtYMD(filtroDe || new Date(today.getFullYear(), today.getMonth(), 1));
+  const until = fmtYMD(filtroAte ? new Date(Math.min(filtroAte.getTime(), today.getTime())) : today);
+  try {
+    const res  = await fetch(ADS_API + '/api/campaigns?since=' + since + '&until=' + until);
+    const json = await res.json();
+    rawADS = (json.data || []).filter(c => c.name.toLowerCase().includes('expan'));
+  } catch(e) {
+    rawADS = [];
+  }
+}
 
 /* ─── Filtro de período ─── */
 let filtroAtivo = 'thismonth';
@@ -1268,21 +1285,7 @@ function computeFilteredCRM() {
 }
 
 function computeFilteredADS() {
-  if (!filtroDe && !filtroAte) return rawADS;
-  if (!rawADS.length) return rawADS;
-  const headers = Object.keys(rawADS[0]);
-  const dateCol = headers.find(h => {
-    const l = h.toLowerCase();
-    return l.includes('início') || l.includes('inicio') || l.includes('start');
-  });
-  if (!dateCol) return rawADS;
-  return rawADS.filter(r => {
-    const d = parseDate(r[dateCol]);
-    if (!d) return false;
-    if (filtroDe && d < filtroDe) return false;
-    if (filtroAte && d > filtroAte) return false;
-    return true;
-  });
+  return rawADS; // API já filtra por data via since/until
 }
 
 function setShortcut(type, el) {
@@ -1319,9 +1322,10 @@ function setShortcut(type, el) {
   applyFiltro();
 }
 
-function applyFiltro() {
+async function applyFiltro() {
   activeCRM = computeFilteredCRM();
-  activeADS = computeFilteredADS();
+  await loadADSfromAPI();
+  activeADS = rawADS;
   renderAll();
 }
 
@@ -1506,7 +1510,7 @@ async function fetchAll() {
 
   const results = await Promise.allSettled([
     fetchOne(URLS.crm, 'crm'),
-    fetchOne(URLS.ads, 'ads'),
+    loadADSfromAPI(),
   ]);
 
   results.forEach((r, i) => {
@@ -1706,14 +1710,8 @@ function renderVisaoGeral() {
   document.getElementById('vg-fechados-valor').textContent =
     valorFechadoVG > 0 ? fmtBRL(valorFechadoVG) : 'Contratos assinados';
 
-  /* CPL: investimento ADS filtrado / total leads */
-  const adsValorCol = activeADS.length
-    ? Object.keys(activeADS[0]).find(h => h.toLowerCase().includes('valor usado') || h.toLowerCase().includes('valor'))
-    : null;
-  const investTotal = activeADS.reduce((s, r) => {
-    const v = parseFloat((adsValorCol ? r[adsValorCol] : 0) || 0);
-    return s + (isNaN(v) ? 0 : v / 100);
-  }, 0);
+  /* CPL: investimento ADS (API) / total leads CRM */
+  const investTotal = rawADS.reduce((s, c) => s + (Number(c.spend) || 0), 0);
   const cpl = total > 0 ? investTotal / total : 0;
 
   document.getElementById('vg-total').textContent  = total;
@@ -2257,72 +2255,38 @@ function renderADS() {
       document.getElementById(id).textContent = '--';
     });
     document.getElementById('ads-campanhas-container').innerHTML =
-      '<div class="empty-state">Sem dados de ADS. Verifique a URL.</div>';
+      '<div class="empty-state">Sem dados de ADS para o período.</div>';
     document.getElementById('ads-cpl-chart').innerHTML = '';
     return;
   }
 
-  /* Usar dados filtrados — colunas detectadas pelo header bruto */
-  const firstRow = rawADS[0];
-  const headers  = Object.keys(firstRow);
-  const adsData  = activeADS.length ? activeADS : rawADS;
+  /* Mapear campanhas da API para estrutura interna */
+  const list = rawADS
+    .sort((a, b) => (b.status === 'ACTIVE' ? 1 : 0) - (a.status === 'ACTIVE' ? 1 : 0) || b.spend - a.spend)
+    .map(c => [c.name, {
+      valor:   Number(c.spend)   || 0,
+      cliques: Number(c.clicks)  || 0,
+      alcance: Number(c.reach)   || 0,
+      cpc:     Number(c.cpc)     || 0,
+      ctr:     Number(c.ctr)     || 0,
+      cpm:     Number(c.cpm)     || 0,
+      ativa:   c.status === 'ACTIVE',
+    }]);
 
-  /* Tentar mapear por header name (posição pode variar) */
-  const findCol = (...names) => {
-    for (const name of names) {
-      const idx = headers.findIndex(h => h.toLowerCase().trim().includes(name.toLowerCase()));
-      if (idx > -1) return headers[idx];
-    }
-    return null;
-  };
-
-  const colNome    = findCol('nome da campanha', 'campanha');
-  const colVeic    = findCol('veiculação', 'veiculacao', 'status');
-  const colLeads   = findCol('resultados', 'leads');
-  const colValor   = findCol('valor usado', 'valor');
-  const colAlcance = findCol('alcance');
-  const colCliques = findCol('cliques');
-  const colCTR     = findCol('ctr');
-
-  /* Agrupar por campanha (dados filtrados) */
-  const campanhas = {};
-  adsData.forEach(r => {
-    const nome = colNome ? (r[colNome] || '').trim() : 'Desconhecida';
-    if (!nome) return;
-    if (!campanhas[nome]) {
-      campanhas[nome] = { leads: 0, valor: 0, alcance: 0, cliques: 0, ativa: false };
-    }
-    const leads  = parseFloat((colLeads  ? r[colLeads]  : 0) || 0);
-    const valor  = parseFloat((colValor  ? r[colValor]  : 0) || 0);
-    const alc    = parseFloat((colAlcance? r[colAlcance]: 0) || 0);
-    const cli    = parseFloat((colCliques? r[colCliques]: 0) || 0);
-    const veic   = (colVeic ? r[colVeic] : '').toLowerCase().trim();
-    campanhas[nome].leads   += isNaN(leads) ? 0 : leads;
-    campanhas[nome].valor   += isNaN(valor) ? 0 : valor / 100;
-    campanhas[nome].alcance += isNaN(alc)   ? 0 : alc;
-    campanhas[nome].cliques += isNaN(cli)   ? 0 : cli;
-    if (veic === 'active') campanhas[nome].ativa = true;
-  });
-
-  const list = Object.entries(campanhas).sort((a, b) =>
-    (b[1].ativa ? 1 : 0) - (a[1].ativa ? 1 : 0) || b[1].valor - a[1].valor
-  );
-  const totalInvest = list.reduce((s, [, d]) => s + d.valor, 0);
-  const totalLeads  = list.reduce((s, [, d]) => s + d.leads, 0);
-  const cplGeral  = totalLeads > 0 ? totalInvest / totalLeads : 0;
-  const fechadosN = getFechadosFiltered().length;
+  const totalInvest  = list.reduce((s, [, d]) => s + d.valor, 0);
+  const totalCliques = list.reduce((s, [, d]) => s + d.cliques, 0);
+  const cpcGeral     = totalCliques > 0 ? totalInvest / totalCliques : 0;
+  const fechadosN    = getFechadosFiltered().length;
 
   document.getElementById('ads-invest').textContent   = fmtBRL(totalInvest);
-  document.getElementById('ads-cpl').textContent      = totalLeads > 0 ? fmtBRL2(cplGeral) : '--';
-  document.getElementById('ads-leads').textContent    = totalLeads;
+  document.getElementById('ads-cpl').textContent      = totalCliques > 0 ? fmtBRL2(cpcGeral) : '--';
+  document.getElementById('ads-leads').textContent    = totalCliques;
   document.getElementById('ads-fechados').textContent = fechadosN || '--';
 
-  /* Campanhas paginadas */
   adsCampanhasData = list;
   adsCampanhasPage = 0;
   renderAdsCampanhas(0);
 
-  /* Gráfico CPL por campanha */
   renderCplChart(list);
 }
 
@@ -2354,17 +2318,16 @@ function renderAdsCampanhas(page) {
   }
 
   const tRows = items.map(([nome, d]) => {
-    const cplVal = d.leads > 0 ? d.valor / d.leads : null;
-    const cpl    = cplVal !== null ? fmtBRL2(cplVal) : '--';
-    const clean  = stripBrackets(nome);
+    const cpc   = d.cpc > 0 ? fmtBRL2(d.cpc) : '--';
+    const clean = stripBrackets(nome);
     const status = d.ativa
       ? '<span class="chip chip-active">Ativa</span>'
       : '<span class="chip chip-paused">Encerrada</span>';
     return `<tr>
       <td>${esc(clean)}</td>
-      <td class="right num-col">${Math.round(d.leads)}</td>
+      <td class="right num-col">${Math.round(d.cliques)}</td>
       <td class="right num-col">${fmtBRL(d.valor)}</td>
-      <td class="right num-col">${cpl}</td>
+      <td class="right num-col">${cpc}</td>
       <td class="num-col">${status}</td>
     </tr>`;
   }).join('');
@@ -2380,9 +2343,9 @@ function renderAdsCampanhas(page) {
     <table class="ez-table ez-table-camps">
       <thead><tr>
         <th>Campanha</th>
-        <th class="right num-col">Leads</th>
+        <th class="right num-col">Cliques</th>
         <th class="right num-col">Investimento</th>
-        <th class="right num-col">CPL</th>
+        <th class="right num-col">CPC</th>
         <th>Status</th>
       </tr></thead>
       <tbody>${tRows}</tbody>
@@ -2395,10 +2358,10 @@ function stripBrackets(str) {
 
 function renderCplChart(list) {
   const data = list
-    .filter(([, d]) => d.leads > 0)
+    .filter(([, d]) => d.cpc > 0)
     .map(([nome, d]) => {
       const clean = stripBrackets(nome);
-      return { nome: clean.length > 32 ? clean.slice(0, 32) + '…' : clean, cpl: d.valor / d.leads };
+      return { nome: clean.length > 32 ? clean.slice(0, 32) + '…' : clean, cpl: d.cpc };
     })
     .slice(0, 10);
 
