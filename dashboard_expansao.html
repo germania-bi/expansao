@@ -1709,10 +1709,14 @@ function getFechadosFiltered() {
 
 function computeQualif() {
   return activeCRM.filter(r => {
-    const etapa  = normalizeEtapa(r);
-    const estado = normalizeEstado(r);
-    if (ETAPAS_EXP.includes(etapa)) return true;
-    if (estado === 'Perdida' && etapa === 'Perdidos' && isExpansao(normalizeResp(r))) return true;
+    const etapa = normalizeEtapa(r);
+    const resp  = normalizeResp(r);
+    // encaminhado pelo SDR → qualificado (responsável ainda pode ser Mirian)
+    if (etapa === 'Encaminhamento para Expansão') return true;
+    // etapas seguintes só contam se responsável é o time de Expansão
+    if (ETAPAS_EXP.includes(etapa) && isExpansao(resp)) return true;
+    // perdidos que já tinham chegado ao time de Expansão
+    if (normalizeEstado(r) === 'Perdida' && etapa === 'Perdidos' && isExpansao(resp)) return true;
     return false;
   }).length;
 }
