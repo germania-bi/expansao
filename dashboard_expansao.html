@@ -1707,22 +1707,8 @@ function getFechadosFiltered() {
    TAB 1: VISÃO GERAL
 ══════════════════════════════════════════════ */
 
-/* Etapas únicas do funil Expansão (exclui "Contato Comercial" que é genérico) */
-const ETAPAS_QUALIF = [
-  'Encaminhamento para Expansão',
-  'Apresentação do Projeto de Viabilidade',
-  'Assinatura do Contrato de Franquia',
-];
-
 function computeQualif() {
-  return rawCRM.filter(r => {
-    const etapa = normalizeEtapa(r);
-    const resp  = normalizeResp(r);
-    if (ETAPAS_QUALIF.includes(etapa)) return true;
-    if (etapa === 'Contato Comercial' && isExpansao(resp)) return true;
-    if (normalizeEstado(r) === 'Perdida' && etapa === 'Perdidos' && isExpansao(resp)) return true;
-    return false;
-  }).length;
+  return activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r))).length;
 }
 
 function renderVisaoGeral() {
