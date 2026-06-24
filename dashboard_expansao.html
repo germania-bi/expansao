@@ -1712,8 +1712,7 @@ function computeQualif() {
     const etapa  = normalizeEtapa(r);
     const estado = normalizeEstado(r);
     if (ETAPAS_EXP.includes(etapa)) return true;
-    // perdidos que vieram da Expansão: proxy pelo responsável (não-Mirian)
-    if (estado === 'Perdida' && etapa === 'Perdidos' && !isSDR(normalizeResp(r))) return true;
+    if (estado === 'Perdida' && etapa === 'Perdidos' && isExpansao(normalizeResp(r))) return true;
     return false;
   }).length;
 }
