@@ -2000,12 +2000,12 @@ function renderQualifPorSemana() {
   const prevYear  = refMonth === 0 ? refYear - 1 : refYear;
   const prevMonth = refMonth === 0 ? 11 : refMonth - 1;
 
-  /* semana do mês: S1=dias 1-7, S2=8-14, S3=15-21, S4=22-28, S5=29+ */
-  const semIdx = d => Math.floor((d.getDate() - 1) / 7);
+  /* semana do mês: S1=dias 1-7, S2=8-14, S3=15-21, S4=22+ (cap em 3) */
+  const semIdx = d => Math.min(Math.floor((d.getDate() - 1) / 7), 3);
 
   const qualif = rawCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
-  const currC  = [0, 0, 0, 0, 0];
-  const prevC  = [0, 0, 0, 0, 0];
+  const currC  = [0, 0, 0, 0];
+  const prevC  = [0, 0, 0, 0];
 
   qualif.forEach(r => {
     const d = parseDate(normalizeDataCriacao(r));
@@ -2014,11 +2014,10 @@ function renderQualifPorSemana() {
     if (d.getFullYear() === prevYear && d.getMonth() === prevMonth) prevC[semIdx(d)]++;
   });
 
-  const daysInMonth = new Date(refYear, refMonth + 1, 0).getDate();
-  const numSem   = daysInMonth > 28 ? 5 : 4;
-  const labels   = ['S1', 'S2', 'S3', 'S4', 'S5'].slice(0, numSem);
-  const currData = currC.slice(0, numSem);
-  const prevData = prevC.slice(0, numSem);
+  const numSem   = 4;
+  const labels   = ['S1', 'S2', 'S3', 'S4'];
+  const currData = currC.slice();
+  const prevData = prevC.slice();
 
   if (!currData.some(v => v > 0) && !prevData.some(v => v > 0)) {
     canvas.style.display = 'none';
@@ -2046,9 +2045,9 @@ function renderQualifPorSemana() {
     borderWidth: 1,
     borderRadius: 4,
     datalabels: {
-      anchor: 'end', align: 'top', offset: 2,
-      color: 'rgba(241,227,206,0.75)',
-      font: { family: 'Barlow Condensed', size: 13, weight: '700' },
+      anchor: 'end', align: 'start', offset: 6,
+      color: 'rgba(15,10,5,0.85)',
+      font: { family: 'Barlow Condensed', size: 14, weight: '700' },
       formatter: v => v > 0 ? v : '',
     },
   }];
@@ -2058,13 +2057,13 @@ function renderQualifPorSemana() {
       label: prevLabel,
       data: prevData,
       type: 'line',
-      borderColor: 'rgba(200,148,26,0.5)',
+      borderColor: 'rgba(241,227,206,0.35)',
       backgroundColor: 'transparent',
-      borderDash: [4, 3],
-      borderWidth: 1.5,
+      borderDash: [5, 4],
+      borderWidth: 2,
       tension: 0.4,
       pointRadius: 4,
-      pointBorderColor: 'rgba(200,148,26,0.7)',
+      pointBorderColor: 'rgba(241,227,206,0.5)',
       pointBackgroundColor: 'transparent',
       pointBorderWidth: 1.5,
       fill: false,
@@ -2082,7 +2081,7 @@ function renderQualifPorSemana() {
     legEl.innerHTML =
       `<span class="leg-item"><span class="leg-dot" style="background:#C92B1E"></span>Melhor semana</span>` +
       `<span class="leg-item"><span class="leg-dot" style="background:rgba(200,148,26,0.75)"></span>${currLabel}</span>` +
-      (hasPrev ? `<span class="leg-item"><span class="leg-line-d"></span>${prevLabel}</span>` : '');
+      (hasPrev ? `<span class="leg-item"><span class="leg-line-d" style="border-top-color:rgba(241,227,206,0.4)"></span>${prevLabel}</span>` : '');
   }
 
   chartInstances['sdr-qualif-container'] = new Chart(canvas, {
