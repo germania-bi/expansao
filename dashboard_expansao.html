@@ -880,9 +880,9 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
           <div class="hk-sub" id="hk-total-sub">no período</div>
         </div>
         <div class="hk">
-          <div class="hk-l">Qualificados</div>
+          <div class="hk-l">Ativos no Funil</div>
           <div class="hk-v" id="hk-ativos">--</div>
-          <div class="hk-sub" id="hk-ativos-sub">pelo SDR</div>
+          <div class="hk-sub" id="hk-ativos-sub">em negociação · Expansão</div>
         </div>
         <div class="hk">
           <div class="hk-l">Fechados</div>
@@ -958,8 +958,8 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="vg-ativos">--</div>
-        <div class="mkpi-l">Qualificados</div>
-        <div class="mkpi-sub" id="vg-ativos-sub">encaminhados à Expansão</div>
+        <div class="mkpi-l">Ativos no Funil</div>
+        <div class="mkpi-sub" id="vg-ativos-sub">em negociação · Expansão</div>
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="vg-fechados" style="color:var(--green)">--</div>
@@ -1653,7 +1653,10 @@ function renderHeader() {
   const fechadosHK = getFechadosFiltered();
   const valorHK    = fechadosHK.reduce((s, r) => s + normalizeValorUnico(r), 0);
   document.getElementById('hk-total').textContent       = total  || '--';
-  document.getElementById('hk-ativos').textContent      = computeQualif() || '--';
+  const ativosHK = activeCRM.filter(r =>
+    ETAPAS_EXP.includes(normalizeEtapa(r)) && normalizeEstado(r) === 'Em Andamento'
+  ).length;
+  document.getElementById('hk-ativos').textContent = ativosHK || '--';
   document.getElementById('hk-assinaturas').textContent = fechadosHK.length || '--';
   document.getElementById('hk-assinaturas-sub').textContent =
     valorHK > 0 ? fmtBRL(valorHK) : 'franquias fechadas';
@@ -1761,8 +1764,12 @@ function computeQualif() {
 }
 
 function renderVisaoGeral() {
-  const total  = activeCRM.length;
-  const qualif = computeQualif();
+  const total = activeCRM.length;
+
+  /* ativos no funil Expansão = Em Andamento nas etapas do time Expansão */
+  const ativosNoFunil = activeCRM.filter(r =>
+    ETAPAS_EXP.includes(normalizeEtapa(r)) && normalizeEstado(r) === 'Em Andamento'
+  ).length;
 
   const fechadosVG = getFechadosFiltered();
   const valorFechadoVG = fechadosVG.reduce((s, r) => s + normalizeValorUnico(r), 0);
@@ -1776,7 +1783,7 @@ function renderVisaoGeral() {
   const cpl = total > 0 ? investTotal / total : 0;
 
   document.getElementById('vg-total').textContent  = total;
-  document.getElementById('vg-ativos').textContent = qualif || '--';
+  document.getElementById('vg-ativos').textContent = ativosNoFunil || '--';
   document.getElementById('vg-cpl').textContent    = investTotal > 0 ? fmtBRL2(cpl) : '--';
 
   renderFunil();
