@@ -518,6 +518,50 @@ body { background: var(--bg); color: var(--txt); }
 /* legend dot */
 .leg-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; flex-shrink: 0; vertical-align: middle; }
 
+/* ══════════════════════════════════════════════
+   LIGHT MODE OVERRIDES
+══════════════════════════════════════════════ */
+:root[data-theme="light"] .card-header {
+  background: var(--bg2);
+}
+:root[data-theme="light"] .funil-bar-wrap {
+  background: var(--bg3);
+}
+:root[data-theme="light"] .pipe-card {
+  background: var(--bg2);
+  border-color: rgba(100,70,20,0.18);
+}
+:root[data-theme="light"] .pipe-card-pct,
+:root[data-theme="light"] .resp-pct-tag {
+  color: var(--txt-faint);
+}
+:root[data-theme="light"] .ez-table td {
+  border-bottom: 1px solid var(--border);
+}
+:root[data-theme="light"] .ez-table tr:hover td {
+  background: var(--bg2);
+}
+:root[data-theme="light"] .alert-box {
+  background: rgba(201,43,30,0.06);
+  border-color: rgba(201,43,30,0.25);
+  color: #7A1208;
+}
+:root[data-theme="light"] .alert-box strong { color: var(--red); }
+:root[data-theme="light"] .chip-paused { background: rgba(200,148,26,0.15); color: #7A5808; }
+:root[data-theme="light"] .chip-active  { background: rgba(46,125,82,0.12);  color: #1E5E3A; }
+:root[data-theme="light"] .dias-warn    { background: rgba(200,148,26,0.15); color: #7A5808; }
+:root[data-theme="light"] .dias-crit    { background: rgba(201,43,30,0.12);  color: #9B2218; }
+:root[data-theme="light"] .leg-line-d   { border-top-color: rgba(42,28,8,0.35); }
+:root[data-theme="light"] .c-title      { background: rgba(200,148,26,0.12); border-color: rgba(200,148,26,0.40); }
+:root[data-theme="light"] .mkpi         { box-shadow: 0 1px 4px rgba(100,70,20,0.08); }
+:root[data-theme="light"] .card         { box-shadow: 0 1px 4px rgba(100,70,20,0.08); }
+:root[data-theme="light"] .hk           { background: rgba(0,0,0,0.18); }
+:root[data-theme="light"] .empty-state  { color: var(--txt-faint); }
+:root[data-theme="light"] .bar-track    { background: var(--bg3); }
+:root[data-theme="light"] .pipe-card-bar { background: var(--bg3); }
+:root[data-theme="light"] .resp-track   { background: var(--bg3); }
+:root[data-theme="light"] .chart-canvas-wrap { background: transparent; }
+
 .pag-controls {
   display: flex;
   align-items: center;
@@ -1617,6 +1661,25 @@ function switchTab(name, el) {
    DARK MODE
 ══════════════════════════════════════════════ */
 
+function isLight() {
+  return document.documentElement.getAttribute('data-theme') === 'light';
+}
+
+function chartCfg() {
+  const light = isLight();
+  return {
+    tick:      light ? 'rgba(42,28,8,0.55)'        : '#A89870',
+    grid:      light ? 'rgba(42,28,8,0.07)'         : 'rgba(255,200,120,0.06)',
+    dataLabel: light ? 'rgba(42,28,8,0.65)'         : 'rgba(241,227,206,0.55)',
+    tooltip:   light ? 'rgba(240,234,220,0.97)'     : 'rgba(26,18,8,0.92)',
+    ttTitle:   light ? '#7A1208'                    : '#FFA62C',
+    ttBody:    light ? '#2A1C08'                    : '#F1E3CE',
+    ttBorder:  light ? 'rgba(100,70,20,0.25)'       : 'rgba(255,166,44,0.2)',
+    prevLine:  light ? 'rgba(42,28,8,0.35)'         : 'rgba(241,227,206,0.35)',
+    prevPt:    light ? 'rgba(42,28,8,0.45)'         : 'rgba(241,227,206,0.5)',
+  };
+}
+
 function toggleDark() {
   const cur = document.documentElement.getAttribute('data-theme') || 'dark';
   const next = cur === 'dark' ? 'light' : 'dark';
@@ -1625,6 +1688,7 @@ function toggleDark() {
   const lbl = next === 'dark' ? 'Claro' : 'Escuro';
   const el = document.getElementById('dark-lbl-bar');
   if (el) el.textContent = lbl;
+  renderAll();
 }
 
 /* ══════════════════════════════════════════════
@@ -1918,7 +1982,7 @@ function renderTimeline(containerId, rows) {
       anchor: 'end',
       align: 'top',
       offset: 2,
-      color: 'rgba(241,227,206,0.45)',
+      color: chartCfg().dataLabel,
       font: { family: 'Barlow Condensed', size: 10, weight: '600' },
       formatter: v => v > 0 ? v : '',
     },
@@ -1928,14 +1992,14 @@ function renderTimeline(containerId, rows) {
     datasets.push({
       label: labelAnt,
       data: prevVals,
-      borderColor: 'rgba(200,148,26,0.75)',
+      borderColor: chartCfg().prevLine,
       backgroundColor: 'transparent',
       borderDash: [4, 3],
       tension: 0.4,
       pointRadius: 3,
       pointHoverRadius: 6,
       pointBackgroundColor: 'transparent',
-      pointBorderColor: 'rgba(200,148,26,0.85)',
+      pointBorderColor: chartCfg().prevPt,
       pointBorderWidth: 1.5,
       fill: false,
       datalabels: { display: false },
@@ -1949,8 +2013,7 @@ function renderTimeline(containerId, rows) {
       (hasPrev ? `<span class="leg-item"><span class="leg-line-d"></span>${labelAnt}</span>` : '');
   }
 
-  const tickColor = '#A89870';
-  const gridColor = 'rgba(255,200,120,0.06)';
+  const cc = chartCfg();
 
   chartInstances[containerId] = new Chart(canvas.getContext('2d'), {
     type: 'line',
@@ -1961,23 +2024,23 @@ function renderTimeline(containerId, rows) {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: 'rgba(26,18,8,0.92)',
-          titleColor: '#FFA62C',
-          bodyColor: '#F1E3CE',
-          borderColor: 'rgba(255,166,44,0.2)',
+          backgroundColor: cc.tooltip,
+          titleColor: cc.ttTitle,
+          bodyColor: cc.ttBody,
+          borderColor: cc.ttBorder,
           borderWidth: 1,
           padding: 10,
         },
       },
       scales: {
         x: {
-          grid: { color: gridColor },
-          ticks: { color: tickColor, font: { size: 10, family: 'Barlow Condensed' }, maxRotation: 0, maxTicksLimit: 15 },
+          grid: { color: cc.grid },
+          ticks: { color: cc.tick, font: { size: 10, family: 'Barlow Condensed' }, maxRotation: 0, maxTicksLimit: 15 },
         },
         y: {
           beginAtZero: true,
-          grid: { color: gridColor },
-          ticks: { color: tickColor, font: { size: 10, family: 'Barlow Condensed' }, precision: 0 },
+          grid: { color: cc.grid },
+          ticks: { color: cc.tick, font: { size: 10, family: 'Barlow Condensed' }, precision: 0 },
         },
       },
     },
@@ -2085,18 +2148,20 @@ function renderQualifPorSemana() {
     },
   }];
 
+  const cc = chartCfg();
+
   if (hasPrev) {
     datasets.push({
       label: prevLabel,
       data: prevData,
       type: 'line',
-      borderColor: 'rgba(241,227,206,0.35)',
+      borderColor: cc.prevLine,
       backgroundColor: 'transparent',
       borderDash: [5, 4],
       borderWidth: 2,
       tension: 0.4,
       pointRadius: 4,
-      pointBorderColor: 'rgba(241,227,206,0.5)',
+      pointBorderColor: cc.prevPt,
       pointBackgroundColor: 'transparent',
       pointBorderWidth: 1.5,
       fill: false,
@@ -2114,7 +2179,7 @@ function renderQualifPorSemana() {
     legEl.innerHTML =
       `<span class="leg-item"><span class="leg-dot" style="background:#C92B1E"></span>Melhor semana</span>` +
       `<span class="leg-item"><span class="leg-dot" style="background:rgba(200,148,26,0.75)"></span>${currLabel}</span>` +
-      (hasPrev ? `<span class="leg-item"><span class="leg-line-d" style="border-top-color:rgba(241,227,206,0.4)"></span>${prevLabel}</span>` : '');
+      (hasPrev ? `<span class="leg-item"><span class="leg-line-d"></span>${prevLabel}</span>` : '');
   }
 
   chartInstances['sdr-qualif-container'] = new Chart(canvas, {
@@ -2127,10 +2192,10 @@ function renderQualifPorSemana() {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: '#1A1208',
-          titleColor: '#C8941A',
-          bodyColor: '#F1E3CE',
-          borderColor: 'rgba(255,166,44,0.2)',
+          backgroundColor: cc.tooltip,
+          titleColor: cc.ttTitle,
+          bodyColor: cc.ttBody,
+          borderColor: cc.ttBorder,
           borderWidth: 1,
           padding: 10,
           callbacks: {
@@ -2140,13 +2205,13 @@ function renderQualifPorSemana() {
       },
       scales: {
         x: {
-          grid: { color: 'rgba(255,200,120,0.06)' },
-          ticks: { color: 'rgba(241,227,206,0.65)', font: { family: 'Barlow Condensed', size: 14, weight: '600' } },
+          grid: { color: cc.grid },
+          ticks: { color: cc.tick, font: { family: 'Barlow Condensed', size: 14, weight: '600' } },
         },
         y: {
           beginAtZero: true,
-          grid: { color: 'rgba(255,200,120,0.06)' },
-          ticks: { color: 'rgba(241,227,206,0.5)', font: { family: 'Barlow Condensed', size: 11 }, stepSize: 1 },
+          grid: { color: cc.grid },
+          ticks: { color: cc.tick, font: { family: 'Barlow Condensed', size: 11 }, stepSize: 1 },
         },
       },
     },
