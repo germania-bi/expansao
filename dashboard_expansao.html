@@ -1181,8 +1181,8 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="ads-leads">--</div>
-        <div class="mkpi-l">Cliques (ADS)</div>
-        <div class="mkpi-sub">Campanhas de Expansão</div>
+        <div class="mkpi-l">CPL</div>
+        <div class="mkpi-sub">Custo por lead (CRM)</div>
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="ads-fechados" style="color:var(--green)">--</div>
@@ -1199,8 +1199,8 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
           <div class="c-sub">Ativas sempre no topo · ordenado por investimento</div>
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0">
-          <button id="fcads-todas"      class="btn-pag btn-pag-active" onclick="adsCampanhasFilter='all';adsCampanhasPage=0;renderAdsCampanhas(0)">Todas</button>
-          <button id="fcads-ativas"     class="btn-pag" onclick="adsCampanhasFilter='ativas';adsCampanhasPage=0;renderAdsCampanhas(0)">Ativas</button>
+          <button id="fcads-todas"      class="btn-pag" onclick="adsCampanhasFilter='all';adsCampanhasPage=0;renderAdsCampanhas(0)">Todas</button>
+          <button id="fcads-ativas"     class="btn-pag btn-pag-active" onclick="adsCampanhasFilter='ativas';adsCampanhasPage=0;renderAdsCampanhas(0)">Ativas</button>
           <button id="fcads-encerradas" class="btn-pag" onclick="adsCampanhasFilter='encerradas';adsCampanhasPage=0;renderAdsCampanhas(0)">Encerradas</button>
         </div>
       </div>
@@ -1299,7 +1299,7 @@ let expAtivosDiasMin = 0;
 let expAtivosAsc   = false;
 let adsCampanhasData   = [];
 let adsCampanhasPage   = 0;
-let adsCampanhasFilter = 'all';
+let adsCampanhasFilter = 'ativas';
 let fpFrom, fpTo;
 
 function computeFilteredCRM() {
@@ -2392,10 +2392,11 @@ function renderADS() {
   const totalCliques = list.reduce((s, [, d]) => s + d.cliques, 0);
   const cpcGeral     = totalCliques > 0 ? totalInvest / totalCliques : 0;
   const fechadosN    = getFechadosFiltered().length;
+  const cplMetric    = activeCRM.length > 0 ? totalInvest / activeCRM.length : 0;
 
   document.getElementById('ads-invest').textContent   = fmtBRL(totalInvest);
   document.getElementById('ads-cpl').textContent      = totalCliques > 0 ? fmtBRL2(cpcGeral) : '--';
-  document.getElementById('ads-leads').textContent    = totalCliques;
+  document.getElementById('ads-leads').textContent    = cplMetric > 0 ? fmtBRL2(cplMetric) : '--';
   document.getElementById('ads-fechados').textContent = fechadosN || '--';
 
   adsCampanhasData = list;
@@ -2476,7 +2477,7 @@ function renderCplChart(list) {
     .filter(([, d]) => d.cpc > 0)
     .map(([nome, d]) => {
       const clean = stripBrackets(nome);
-      return { nome: clean.length > 32 ? clean.slice(0, 32) + '…' : clean, cpl: d.cpc };
+      return { nome: clean.length > 48 ? clean.slice(0, 48) + '…' : clean, cpl: d.cpc };
     })
     .slice(0, 10);
 
@@ -2492,7 +2493,7 @@ function renderCplChart(list) {
 
   const cplContainer = document.getElementById('ads-cpl-chart');
   const cplW    = (cplContainer && cplContainer.offsetWidth > 200) ? cplContainer.offsetWidth - 8 : 500;
-  const labelW  = Math.min(220, Math.round(cplW * 0.40));
+  const labelW  = Math.min(340, Math.round(cplW * 0.55));
   const valW    = 80;
   const barMaxW = cplW - labelW - valW - 16;
   const totalW  = cplW;
