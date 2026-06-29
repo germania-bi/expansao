@@ -503,6 +503,18 @@ body { background: var(--bg); color: var(--txt); }
 .pipe-card-bar { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
 .pipe-card-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width .4s; }
 .pipe-card-pct { font-family: 'Barlow Condensed',sans-serif; font-size: 10px; color: rgba(241,227,206,.3); }
+/* por agente — lista horizontal */
+.resp-list { padding: 4px 0; }
+.resp-row { padding: 12px 16px 10px; border-bottom: 1px solid var(--border); }
+.resp-row:last-child { border-bottom: none; }
+.resp-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; }
+.resp-name { font-family: 'Barlow Condensed',sans-serif; font-size: 13px; color: var(--txt); text-transform: uppercase; letter-spacing:.05em; }
+.resp-kpi { display: flex; align-items: baseline; gap: 6px; }
+.resp-num { font-family: 'Barlow Condensed',sans-serif; font-size: 30px; font-weight: 700; color: var(--gold); line-height: 1; }
+.resp-pct-tag { font-family: 'Barlow Condensed',sans-serif; font-size: 12px; color: var(--txt-faint); }
+.resp-track { height: 5px; background: var(--bg3); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+.resp-fill { height: 100%; background: var(--gold); border-radius: 3px; transition: width .4s; }
+.resp-sub { font-size: 11px; color: var(--txt-faint); }
 /* legend dot */
 .leg-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; flex-shrink: 0; vertical-align: middle; }
 
@@ -2354,23 +2366,23 @@ function renderResponsaveis(containerId, rows) {
     return;
   }
 
-  const gridClass = sorted.length > 2 ? 'pipe-cards pipe-cards-grid' : 'pipe-cards';
-
-  const cards = sorted.map(([resp, d]) => {
-    const pct      = totalAll > 0 ? ((d.total / totalAll) * 100).toFixed(1) : '0';
-    const pctPerd  = d.total > 0 ? Math.round(d.perdidos / d.total * 100) : 0;
-    const primeiroNome = resp.split(' ')[0];
+  const items = sorted.map(([resp, d]) => {
+    const pct     = totalAll > 0 ? ((d.total / totalAll) * 100).toFixed(1) : '0';
+    const pctNum  = totalAll > 0 ? Math.round(d.total / totalAll * 100) : 0;
+    const pctPerd = d.total > 0 ? Math.round(d.perdidos / d.total * 100) : 0;
     return `
-    <div class="pipe-card">
-      <div class="pipe-card-label">${esc(primeiroNome)}</div>
-      <div class="pipe-card-num">${d.total}</div>
-      <div class="pipe-card-bar"><div class="pipe-card-bar-fill" style="width:${pct}%"></div></div>
-      <div class="pipe-card-pct">${d.ativos} ativos · ${d.perdidos} perd. (${pctPerd}%)</div>
+    <div class="resp-row">
+      <div class="resp-header">
+        <span class="resp-name">${esc(resp)}</span>
+        <span class="resp-kpi"><span class="resp-num">${d.total}</span><span class="resp-pct-tag">${pctNum}%</span></span>
+      </div>
+      <div class="resp-track"><div class="resp-fill" style="width:${pct}%"></div></div>
+      <div class="resp-sub">${d.ativos} ativos · ${d.perdidos} perd. (${pctPerd}%)</div>
     </div>`;
   }).join('');
 
   document.getElementById(containerId).innerHTML =
-    `<div class="pipe-stat-wrap"><div class="pipe-total">${totalAll} leads no período</div><div class="${gridClass}">${cards}</div></div>`;
+    `<div class="pipe-total" style="padding:10px 16px 0;text-align:right">${totalAll} leads no período</div><div class="resp-list">${items}</div>`;
 }
 
 /* ══════════════════════════════════════════════
