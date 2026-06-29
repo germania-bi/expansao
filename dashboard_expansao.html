@@ -495,6 +495,8 @@ body { background: var(--bg); color: var(--txt); }
 .pipe-stat-wrap { padding: 10px 16px 16px; }
 .pipe-total { font-family: 'Barlow Condensed',sans-serif; font-size: 11px; color: var(--txt-faint); text-align: right; margin-bottom: 10px; text-transform: uppercase; letter-spacing:.05em; }
 .pipe-cards { display: flex; gap: 10px; }
+.pipe-cards-grid { flex-wrap: wrap; }
+.pipe-cards-grid .pipe-card { flex: 0 0 calc(50% - 5px); }
 .pipe-card { flex: 1; background: rgba(255,200,120,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 16px 12px 12px; text-align: center; }
 .pipe-card-label { font-family: 'Barlow Condensed',sans-serif; font-size: 11px; color: var(--txt-faint); text-transform: uppercase; letter-spacing:.04em; margin-bottom: 8px; }
 .pipe-card-num { font-family: 'Barlow Condensed',sans-serif; font-size: 44px; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 10px; }
@@ -1127,8 +1129,8 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       <!-- Por responsável -->
       <div class="card">
         <div class="card-header">
-          <div class="c-title">Por Responsável</div>
-          <div class="c-sub">Total e perdidos por agente</div>
+          <div class="c-title">Por Agente</div>
+          <div class="c-sub">Leads ativos e perdas por responsável</div>
         </div>
         <div id="exp-resp-container">
           <div class="empty-state">Aguardando dados...</div>
@@ -1138,8 +1140,8 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       <!-- Pipeline etapas -->
       <div class="card">
         <div class="card-header">
-          <div class="c-title">Pipeline por Etapa</div>
-          <div class="c-sub">Contagem atual por etapa de expansão</div>
+          <div class="c-title">Em Andamento · Etapas</div>
+          <div class="c-sub">Leads ativos por etapa do funil</div>
         </div>
         <div id="exp-pipeline-container">
           <div class="empty-state">Aguardando dados...</div>
@@ -1507,6 +1509,13 @@ const ETAPAS_FUNIL = [
 ];
 
 const ETAPAS_SDR = ['Interesse Inicial', 'Coleta de Dados'];
+
+const ETAPA_SHORT = {
+  'Encaminhamento para Expansão':              'Encaminhamento',
+  'Contato Comercial':                         'Contato Comercial',
+  'Apresentação do Projeto de Viabilidade':    'Viabilidade',
+  'Assinatura do Contrato de Franquia':        'Assinatura',
+};
 
 /* Localização manual por nome de lead (não vem da planilha) */
 const LOCALIZACOES = {
@@ -2165,13 +2174,16 @@ function renderPipelineAtivo(containerId, allRows, etapas) {
     if (counts[e] !== undefined) counts[e]++;
   });
 
+  const gridClass = etapas.length > 2 ? 'pipe-cards pipe-cards-grid' : 'pipe-cards';
+
   const cards = etapas.map(e => {
-    const n   = counts[e];
-    const pct = total > 0 ? ((n / total) * 100).toFixed(1) : '0';
+    const n        = counts[e];
+    const pct      = total > 0 ? ((n / total) * 100).toFixed(1) : '0';
     const pctRound = total > 0 ? Math.round(n / total * 100) : 0;
+    const label    = ETAPA_SHORT[e] || e;
     return `
     <div class="pipe-card">
-      <div class="pipe-card-label">${esc(e)}</div>
+      <div class="pipe-card-label">${esc(label)}</div>
       <div class="pipe-card-num">${n}</div>
       <div class="pipe-card-bar"><div class="pipe-card-bar-fill" style="width:${pct}%"></div></div>
       <div class="pipe-card-pct">${pctRound}% do pipeline</div>
@@ -2180,7 +2192,7 @@ function renderPipelineAtivo(containerId, allRows, etapas) {
 
   const totalLine = `<div class="pipe-total">${total} em andamento</div>`;
   document.getElementById(containerId).innerHTML =
-    `<div class="pipe-stat-wrap">${totalLine}<div class="pipe-cards">${cards}</div></div>`;
+    `<div class="pipe-stat-wrap">${totalLine}<div class="${gridClass}">${cards}</div></div>`;
 }
 
 /* ══════════════════════════════════════════════
@@ -2329,28 +2341,36 @@ function renderResponsaveis(containerId, rows) {
   const map = {};
   rows.forEach(r => {
     const resp = normalizeResp(r) || 'Desconhecido';
-    if (!map[resp]) map[resp] = { total: 0, perdidos: 0 };
+    if (!map[resp]) map[resp] = { total: 0, perdidos: 0, ativos: 0 };
     map[resp].total++;
     if (normalizeEstado(r) === 'Perdida') map[resp].perdidos++;
+    else map[resp].ativos++;
   });
   const sorted = Object.entries(map).sort((a, b) => b[1].total - a[1].total);
-  const maxVal = Math.max(...sorted.map(([, d]) => d.total), 1);
+  const totalAll = rows.length;
 
-  const rows_html = sorted.map(([resp, d]) => {
-    const pct = ((d.total / maxVal) * 100).toFixed(1);
-    const pctPerd = d.total > 0 ? ((d.perdidos / d.total) * 100).toFixed(0) : 0;
+  if (!sorted.length) {
+    document.getElementById(containerId).innerHTML = '<div class="empty-state">Sem dados.</div>';
+    return;
+  }
+
+  const gridClass = sorted.length > 2 ? 'pipe-cards pipe-cards-grid' : 'pipe-cards';
+
+  const cards = sorted.map(([resp, d]) => {
+    const pct      = totalAll > 0 ? ((d.total / totalAll) * 100).toFixed(1) : '0';
+    const pctPerd  = d.total > 0 ? Math.round(d.perdidos / d.total * 100) : 0;
+    const primeiroNome = resp.split(' ')[0];
     return `
-    <div class="bar-row">
-      <div class="bar-label">
-        <span>${esc(resp)}</span>
-        <strong>${d.total}</strong>
-      </div>
-      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
-      <div class="bar-sub">${d.perdidos} perdido${d.perdidos !== 1 ? 's' : ''} &nbsp;·&nbsp; ${pctPerd}%</div>
+    <div class="pipe-card">
+      <div class="pipe-card-label">${esc(primeiroNome)}</div>
+      <div class="pipe-card-num">${d.total}</div>
+      <div class="pipe-card-bar"><div class="pipe-card-bar-fill" style="width:${pct}%"></div></div>
+      <div class="pipe-card-pct">${d.ativos} ativos · ${d.perdidos} perd. (${pctPerd}%)</div>
     </div>`;
   }).join('');
 
-  document.getElementById(containerId).innerHTML = `<div class="bar-list">${rows_html}</div>`;
+  document.getElementById(containerId).innerHTML =
+    `<div class="pipe-stat-wrap"><div class="pipe-total">${totalAll} leads no período</div><div class="${gridClass}">${cards}</div></div>`;
 }
 
 /* ══════════════════════════════════════════════
