@@ -1521,6 +1521,7 @@ const ETAPAS_FUNIL = [
 ];
 
 const ETAPAS_SDR = ['Interesse Inicial', 'Coleta de Dados'];
+const ETAPAS_FUNIL_ATIVO = ['Interesse Inicial', 'Coleta de Dados', 'Encaminhamento para Expansão', 'Contato Comercial'];
 
 const ETAPA_SHORT = {
   'Encaminhamento para Expansão':              'Encaminhamento',
@@ -1654,7 +1655,7 @@ function renderHeader() {
   const valorHK    = fechadosHK.reduce((s, r) => s + normalizeValorUnico(r), 0);
   document.getElementById('hk-total').textContent       = total  || '--';
   const ativosHK = activeCRM.filter(r =>
-    ETAPAS_EXP.includes(normalizeEtapa(r)) && normalizeEstado(r) === 'Em Andamento'
+    ETAPAS_FUNIL_ATIVO.includes(normalizeEtapa(r)) && normalizeEstado(r) === 'Em Andamento'
   ).length;
   document.getElementById('hk-ativos').textContent = ativosHK || '--';
   document.getElementById('hk-assinaturas').textContent = fechadosHK.length || '--';
@@ -1704,15 +1705,19 @@ function normalizeTelefone(row) {
 
 function normalizeValorUnico(row) {
   const s = getField(row, 'Valor Único', 'Valor Unico', 'valor único', 'valor unico').trim();
-  if (!s || s === '0' || s === '0.0' || s === '0,0') return 0;
+  if (!s || s === '0' || s === '0,0') return 0;
   let v = s.replace(/[R$\s]/g, '');
-  // Detectar formato: se tem vírgula decimal (pt-BR: 150.000,00)
   if (/,\d{1,2}$/.test(v)) {
-    // Formato brasileiro: . = milhar, , = decimal → remove pontos, troca vírgula
+    // pt-BR: 150.000,00 → remove pontos de milhar, troca vírgula por ponto
     v = v.replace(/\./g, '').replace(',', '.');
   } else {
-    // Só número inteiro formatado (150.000) → remove pontos de milhar
-    v = v.replace(/\./g, '');
+    const dots = (v.match(/\./g) || []).length;
+    if (dots === 1 && /\.\d{1,2}$/.test(v)) {
+      // Ponto decimal neutro: 150000.0 ou 150000.00 → manter como está
+    } else {
+      // Sem ponto ou pontos de milhar BR: 150000 / 150.000 / 1.500.000
+      v = v.replace(/\./g, '');
+    }
   }
   return parseFloat(v) || 0;
 }
@@ -1766,9 +1771,9 @@ function computeQualif() {
 function renderVisaoGeral() {
   const total = activeCRM.length;
 
-  /* ativos no funil Expansão = Em Andamento nas etapas do time Expansão */
+  /* ativos no funil = Em Andamento em Interesse Inicial, Coleta de Dados, Encaminhamento para Expansão ou Contato Comercial */
   const ativosNoFunil = activeCRM.filter(r =>
-    ETAPAS_EXP.includes(normalizeEtapa(r)) && normalizeEstado(r) === 'Em Andamento'
+    ETAPAS_FUNIL_ATIVO.includes(normalizeEtapa(r)) && normalizeEstado(r) === 'Em Andamento'
   ).length;
 
   const fechadosVG = getFechadosFiltered();
