@@ -1815,9 +1815,6 @@ function renderTimeline(containerId, rows) {
   }
   canvas.style.display = '';
 
-  const labels = sorted.map(([k]) => k.slice(5));   // MM-DD
-  const vals   = sorted.map(([, v]) => v);
-
   /* período anterior — mesmo span deslocado, usando rawCRM */
   const n = sorted.length;
   const prevDays = {};
@@ -1836,8 +1833,28 @@ function renderTimeline(containerId, rows) {
   });
   const hasPrev = prevVals.some(v => v !== null && v > 0);
 
+  /* nomes de período para legenda */
+  const _fmtMon = d => d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.','');
+  const _fmtDay = d => d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.','');
+  const firstDate = new Date(sorted[0][0] + 'T00:00:00');
+  const lastDate  = new Date(sorted[sorted.length-1][0] + 'T00:00:00');
+  const prevFirst = new Date(firstDate); prevFirst.setDate(prevFirst.getDate() - n);
+  const prevLast  = new Date(lastDate);  prevLast.setDate(prevLast.getDate() - n);
+  const _fmtRange = (s, e) => n <= 8
+    ? _fmtDay(s) + ' – ' + _fmtDay(e)
+    : (_fmtMon(s) === _fmtMon(e) ? _fmtMon(s) : _fmtMon(s) + ' – ' + _fmtMon(e));
+  const labelAtual = _fmtRange(firstDate, lastDate);
+  const labelAnt   = _fmtRange(prevFirst, prevLast);
+
+  /* eixo X: dia + mês abreviado (ex: "1 jun") */
+  const labels = sorted.map(([k]) => {
+    const d = new Date(k + 'T00:00:00');
+    return d.getDate() + ' ' + d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.','');
+  });
+  const vals = sorted.map(([, v]) => v);
+
   const datasets = [{
-    label: 'Atual',
+    label: labelAtual,
     data: vals,
     borderColor: '#C92B1E',
     backgroundColor: 'rgba(201,43,30,0.15)',
@@ -1861,7 +1878,7 @@ function renderTimeline(containerId, rows) {
 
   if (hasPrev) {
     datasets.push({
-      label: 'Período ant.',
+      label: labelAnt,
       data: prevVals,
       borderColor: 'rgba(200,148,26,0.75)',
       backgroundColor: 'transparent',
@@ -1880,8 +1897,8 @@ function renderTimeline(containerId, rows) {
   /* legenda HTML */
   if (legEl) {
     legEl.innerHTML =
-      `<span class="leg-item"><span class="leg-line-s"></span>Atual</span>` +
-      (hasPrev ? `<span class="leg-item"><span class="leg-line-d"></span>Período ant.</span>` : '');
+      `<span class="leg-item"><span class="leg-line-s"></span>${labelAtual}</span>` +
+      (hasPrev ? `<span class="leg-item"><span class="leg-line-d"></span>${labelAnt}</span>` : '');
   }
 
   const tickColor = '#A89870';
