@@ -2462,23 +2462,23 @@ function renderResponsaveis(containerId, rows) {
     return;
   }
 
-  const items = sorted.map(([resp, d]) => {
-    const pct     = totalAll > 0 ? ((d.total / totalAll) * 100).toFixed(1) : '0';
-    const pctNum  = totalAll > 0 ? Math.round(d.total / totalAll * 100) : 0;
-    const pctPerd = d.total > 0 ? Math.round(d.perdidos / d.total * 100) : 0;
+  const cards = sorted.map(([resp, d]) => {
+    const pct     = totalAll > 0 ? Math.round(d.total / totalAll * 100) : 0;
+    const pctPerd = d.total  > 0 ? Math.round(d.perdidos / d.total * 100) : 0;
     return `
-    <div class="resp-row">
-      <div class="resp-header">
-        <span class="resp-name">${esc(resp)}</span>
-        <span class="resp-kpi"><span class="resp-num">${d.total}</span><span class="resp-pct-tag">${pctNum}%</span></span>
-      </div>
-      <div class="resp-track"><div class="resp-fill" style="width:${pct}%"></div></div>
-      <div class="resp-sub">${d.ativos} ativos · ${d.perdidos} perd. (${pctPerd}%)</div>
-    </div>`;
+      <div class="pipe-card">
+        <div class="pipe-card-label">${esc(resp)}</div>
+        <div class="pipe-card-num">${d.total}</div>
+        <div class="pipe-card-bar"><div class="pipe-card-bar-fill" style="width:${pct}%"></div></div>
+        <div class="pipe-card-pct">${d.ativos} ativos · ${d.perdidos} perd. (${pctPerd}%)</div>
+      </div>`;
   }).join('');
 
   document.getElementById(containerId).innerHTML =
-    `<div class="pipe-total" style="padding:10px 16px 0;text-align:right">${totalAll} leads no período</div><div class="resp-list">${items}</div>`;
+    `<div class="pipe-stat-wrap">
+      <div class="pipe-total">${totalAll} leads no período</div>
+      <div class="pipe-cards pipe-cards-grid">${cards}</div>
+    </div>`;
 }
 
 /* ══════════════════════════════════════════════
