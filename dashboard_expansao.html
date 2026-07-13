@@ -1850,12 +1850,7 @@ function computeQualif() {
   return activeCRM.filter(r => {
     const funil = normalizeFunil(r);
     if (funil && funil !== '*Expansão Rede') return false;
-    const etapa = normalizeEtapa(r);
-    const resp  = normalizeResp(r);
-    if (etapa === 'Encaminhamento para Expansão') return true;
-    if (ETAPAS_EXP.includes(etapa) && isExpansao(resp)) return true;
-    if (normalizeEstado(r) === 'Perdida' && etapa === 'Perdidos' && isExpansao(resp)) return true;
-    return false;
+    return ETAPAS_EXP.includes(normalizeEtapa(r));
   }).length;
 }
 
