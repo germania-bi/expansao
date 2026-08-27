@@ -260,41 +260,44 @@ body { background: var(--bg); color: var(--txt); }
    KPI ROW (.mkpi)
 ══════════════════════════════════════════════ */
 .mkpi-row {
-  display: grid;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-.mkpi-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
-.mkpi-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
-
-.mkpi {
+  display: flex;
   background: var(--card-bg);
   border: 1px solid var(--card-bd);
-  border-radius: 10px;
-  padding: 18px 20px;
+  border-radius: 14px;
+  margin-bottom: 28px;
+  overflow: hidden;
 }
+.mkpi {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 32px;
+  border-right: 1px solid var(--card-bd);
+}
+.mkpi:last-child { border-right: none; }
 .mkpi-v {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 54px;
+  font-size: 68px;
   font-weight: 900;
   color: var(--txt);
-  line-height: 1;
-  margin-bottom: 4px;
+  line-height: 0.88;
+  letter-spacing: -0.01em;
 }
 .mkpi-l {
+  order: -1;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 600;
-  letter-spacing: 1.2px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--txt-faint);
-  margin-top: 6px;
+  margin-bottom: 14px;
 }
 .mkpi-sub {
   font-family: 'Barlow', sans-serif;
-  font-size: 11px;
+  font-size: 12.5px;
   color: var(--txt-faint);
-  margin-top: 3px;
+  margin-top: 9px;
 }
 
 /* ══════════════════════════════════════════════
@@ -303,36 +306,29 @@ body { background: var(--bg); color: var(--txt); }
 .card {
   background: var(--card-bg);
   border: 1px solid var(--card-bd);
-  border-radius: 10px;
-  padding: 20px;
+  border-radius: 14px;
+  padding: 28px 30px;
   margin-bottom: 20px;
   overflow: hidden;
 }
 .card-header {
-  margin: -20px -20px 16px;
-  padding: 14px 20px 12px;
-  background: linear-gradient(180deg, var(--bg3) 0%, var(--card-bg) 100%);
+  margin: -28px -30px 22px;
+  padding: 22px 30px 18px;
   border-bottom: 1px solid var(--card-bd);
 }
 .c-title {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
+  display: block;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--gold);
-  border-radius: 20px;
-  padding: 3px 12px;
-  border: 1px solid rgba(200,148,26,0.30);
-  background: rgba(200,148,26,0.08);
-  margin-bottom: 6px;
+  color: var(--gold-lt);
+  margin-bottom: 5px;
 }
 .c-sub {
   font-family: 'Barlow', sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
   color: var(--txt-faint);
   line-height: 1.45;
@@ -348,6 +344,17 @@ body { background: var(--bg); color: var(--txt); }
   gap: 20px;
   margin-bottom: 20px;
 }
+.grid-funil {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+  align-items: start;
+}
+.side-stack { display: flex; flex-direction: column; gap: 22px; }
+.side-block { padding-top: 22px; border-top: 1px solid var(--card-bd); }
+.side-block:first-child { padding-top: 0; border-top: none; }
+.side-block .c-title { margin-bottom: 14px; }
 
 /* ══════════════════════════════════════════════
    TABLES (.ez-table)
@@ -356,7 +363,7 @@ body { background: var(--bg); color: var(--txt); }
   width: 100%;
   border-collapse: collapse;
   font-family: 'Barlow', sans-serif;
-  font-size: 13px;
+  font-size: 14.5px;
 }
 .ez-table th {
   font-family: 'Barlow Condensed', sans-serif;
@@ -366,12 +373,12 @@ body { background: var(--bg); color: var(--txt); }
   text-transform: uppercase;
   color: var(--txt-faint);
   border-bottom: 1px solid var(--border);
-  padding: 6px 10px;
+  padding: 8px 12px;
   text-align: left;
 }
 .ez-table th.right, .ez-table td.right { text-align: right; }
 .ez-table td {
-  padding: 8px 10px;
+  padding: 14px 12px;
   color: var(--txt);
   border-bottom: 1px solid rgba(255,200,120,0.05);
 }
@@ -414,75 +421,87 @@ body { background: var(--bg); color: var(--txt); }
 .alert-box strong { color: #E05548; }
 
 /* ══════════════════════════════════════════════
-   FUNIL (barras horizontais)
+   FUNIL (gráfico de colunas · SDR + Comercial)
 ══════════════════════════════════════════════ */
-.funil-row {
+.funil-legend { display: flex; gap: 22px; margin-bottom: 22px; }
+.funil-legend-item {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12.5px; letter-spacing: 0.05em;
+  color: var(--txt-faint); text-transform: uppercase;
+}
+.funil-legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
+
+.funil-chart {
   display: flex;
-  flex-direction: column;
+  align-items: flex-end;
   gap: 10px;
-}
-.funil-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.funil-label-wrap {
-  width: 230px;
-  flex-shrink: 0;
-}
-.funil-label {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  color: var(--txt-faint);
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.funil-conv {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px;
-  color: var(--txt-faint);
-  opacity: 0.7;
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.funil-bar-wrap {
-  flex: 1;
-  height: 28px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 4px;
-  overflow: hidden;
+  height: 250px;
+  padding: 0 4px;
+  border-bottom: 1px solid var(--border);
   position: relative;
 }
-.funil-bar {
-  height: 100%;
-  border-radius: 4px;
+.funil-col {
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding-left: 10px;
-  transition: width 0.4s ease;
-  min-width: 40px;
+  justify-content: flex-end;
+  flex: 1;
+  height: 100%;
 }
-.funil-count {
+.funil-divider {
+  position: absolute;
+  left: -5px; top: 0; bottom: 0;
+  border-left: 1px dashed rgba(255,200,120,0.28);
+}
+.funil-col-num {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  color: rgba(255,255,255,0.9);
-  white-space: nowrap;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--txt);
+  margin-bottom: 9px;
+  line-height: 1;
 }
-.funil-zero {
+.funil-col-bar {
+  width: 100%;
+  max-width: 58px;
+  border-radius: 6px 6px 2px 2px;
+}
+.funil-col-zero {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 13px;
   font-weight: 700;
   color: var(--txt-faint);
-  padding-left: 10px;
-  line-height: 28px;
-  display: inline-block;
+}
+.funil-labels {
+  display: flex;
+  gap: 10px;
+  padding: 0 4px;
+  margin-top: 12px;
+}
+.funil-labels > div {
+  flex: 1;
+  text-align: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--txt-faint);
+  letter-spacing: 0.01em;
+}
+.funil-resumo { display: flex; gap: 32px; margin-top: 26px; flex-wrap: wrap; }
+.funil-resumo-item { display: flex; align-items: baseline; gap: 8px; }
+.funil-resumo-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--txt);
+}
+.funil-resumo-lbl {
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  color: var(--txt-faint);
 }
 
 /* ══════════════════════════════════════════════
@@ -518,9 +537,9 @@ body { background: var(--bg); color: var(--txt); }
 .pipe-cards { display: flex; gap: 10px; }
 .pipe-cards-grid { flex-wrap: wrap; }
 .pipe-cards-grid .pipe-card { flex: 0 0 calc(50% - 5px); }
-.pipe-card { flex: 1; background: rgba(255,200,120,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 16px 12px 12px; text-align: center; }
-.pipe-card-label { font-family: 'Barlow Condensed',sans-serif; font-size: 11px; color: var(--txt-faint); text-transform: uppercase; letter-spacing:.04em; margin-bottom: 8px; }
-.pipe-card-num { font-family: 'Barlow Condensed',sans-serif; font-size: 44px; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 10px; }
+.pipe-card { flex: 1; background: rgba(255,200,120,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 20px 16px 16px; text-align: center; }
+.pipe-card-label { font-family: 'Barlow Condensed',sans-serif; font-size: 11.5px; color: var(--txt-faint); text-transform: uppercase; letter-spacing:.04em; margin-bottom: 10px; }
+.pipe-card-num { font-family: 'Barlow Condensed',sans-serif; font-size: 52px; font-weight: 800; color: var(--gold-lt); line-height: 1; margin-bottom: 12px; }
 .pipe-card-bar { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
 .pipe-card-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width .4s; }
 .pipe-card-pct { font-family: 'Barlow Condensed',sans-serif; font-size: 10px; color: rgba(241,227,206,.3); }
@@ -544,11 +563,9 @@ body { background: var(--bg); color: var(--txt); }
 ══════════════════════════════════════════════ */
 /* — KPI cards — */
 :root[data-theme="light"] .mkpi {
-  border-left: 3px solid var(--gold);
   border-color: rgba(100,70,20,0.10);
-  padding-left: 17px;
-  box-shadow: 0 1px 8px rgba(100,70,20,0.09);
 }
+:root[data-theme="light"] .mkpi-row { box-shadow: 0 1px 8px rgba(100,70,20,0.09); }
 :root[data-theme="light"] .mkpi-v { color: var(--txt); }
 /* — Content cards — */
 :root[data-theme="light"] .card {
@@ -560,7 +577,8 @@ body { background: var(--bg); color: var(--txt); }
   border-bottom-color: rgba(100,70,20,0.10);
 }
 /* — Funil — */
-:root[data-theme="light"] .funil-bar-wrap { background: rgba(100,70,20,0.07); }
+:root[data-theme="light"] .funil-chart { border-bottom-color: rgba(100,70,20,0.14); }
+:root[data-theme="light"] .funil-col-num { color: var(--txt); }
 /* — Pipeline cards — */
 :root[data-theme="light"] .pipe-card {
   background: var(--card-bg);
@@ -596,7 +614,6 @@ body { background: var(--bg); color: var(--txt); }
 :root[data-theme="light"] .dark-toggle-thumb { box-shadow: 0 1px 3px rgba(42,28,8,0.30); }
 /* — Misc — */
 :root[data-theme="light"] .leg-line-d  { border-top-color: rgba(42,28,8,0.35); }
-:root[data-theme="light"] .c-title     { background: rgba(200,148,26,0.12); border-color: rgba(200,148,26,0.40); }
 :root[data-theme="light"] .hk          { background: rgba(0,0,0,0.18); }
 :root[data-theme="light"] .empty-state { color: var(--txt-faint); }
 :root[data-theme="light"] .chart-canvas-wrap { background: transparent; }
@@ -1056,54 +1073,43 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       </div>
     </div>
 
-    <!-- Funil -->
-    <div class="card">
-      <div class="card-header">
-        <div class="c-title">Funil de Expansão · Expansão [V4]</div>
-        <div class="c-sub">Volume por etapa · % de conversão em relação à etapa anterior e ao total de leads</div>
+    <div class="grid-funil">
+      <!-- Funil -->
+      <div class="card">
+        <div class="card-header">
+          <div class="c-title">Funil de Expansão · Expansão [V4]</div>
+          <div class="c-sub">SDR → Comercial · volume ativo por etapa</div>
+        </div>
+        <div id="funil-container">
+          <div class="empty-state">Aguardando dados...</div>
+        </div>
       </div>
-      <div id="funil-container" class="funil-row">
-        <div class="empty-state">Aguardando dados...</div>
-      </div>
-    </div>
 
-    <!-- Timeline semanal -->
-    <div class="card">
-      <div class="card-header">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div class="c-title">Leads por Dia</div>
-            <div class="c-sub">Novos leads criados por dia · data de criação</div>
+      <!-- Lateral: timeline + cidade + capital -->
+      <div class="card side-stack">
+        <div class="side-block">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div class="c-title" style="margin-bottom:0">Leads por Dia</div>
+            <div class="chart-legend" id="leg-timeline"></div>
           </div>
-          <div class="chart-legend" id="leg-timeline"></div>
+          <div class="chart-canvas-wrap" style="height:150px"><canvas id="canvas-timeline"></canvas></div>
+          <div id="timeline-container" style="display:none">
+            <div class="empty-state">Aguardando dados...</div>
+          </div>
         </div>
-      </div>
-      <div class="chart-canvas-wrap"><canvas id="canvas-timeline"></canvas></div>
-      <div id="timeline-container" style="display:none">
-        <div class="empty-state">Aguardando dados...</div>
-      </div>
-    </div>
 
-    <div class="grid-2">
-      <!-- Leads por cidade -->
-      <div class="card">
-        <div class="card-header">
-          <div class="c-title">Leads por Cidade</div>
-          <div class="c-sub">Cidade do lead · campo do RD CRM</div>
+        <div class="side-block">
+          <div class="c-title">Top Cidades</div>
+          <div id="vg-cidade-container">
+            <div class="empty-state">Aguardando dados...</div>
+          </div>
         </div>
-        <div id="vg-cidade-container">
-          <div class="empty-state">Aguardando dados...</div>
-        </div>
-      </div>
 
-      <!-- Capital disponível -->
-      <div class="card">
-        <div class="card-header">
+        <div class="side-block">
           <div class="c-title">Capital Disponível</div>
-          <div class="c-sub">Faixa de capital informada pelo lead</div>
-        </div>
-        <div id="vg-capital-container">
-          <div class="empty-state">Aguardando dados...</div>
+          <div id="vg-capital-container">
+            <div class="empty-state">Aguardando dados...</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1229,41 +1235,36 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       </div>
     </div>
 
-    <!-- Leads ativos com dias parados -->
-    <div class="card">
-      <div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-        <div>
-          <div class="c-title">Leads Ativos — Dias no Pipeline</div>
-          <div class="c-sub">Comercial Expansão · ordenado por mais antigo</div>
-        </div>
-        <button id="exp-ativos-sort" class="btn-pag" onclick="expAtivosAsc=!expAtivosAsc;expAtivosPage=0;renderExpAtivos(0)" style="white-space:nowrap">↓ Mais antigo</button>
-      </div>
-      <div id="exp-ativos-container">
-        <div class="empty-state">Aguardando dados...</div>
-      </div>
-      <p class="footnote">* Dias calculados desde a criação do lead — RD Station não exporta data de entrada por etapa.</p>
-    </div>
-
-    <div class="grid-2">
-      <!-- Por responsável -->
+    <div class="grid-funil">
+      <!-- Leads ativos com dias parados -->
       <div class="card">
-        <div class="card-header">
+        <div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div>
+            <div class="c-title">Leads Ativos — Dias no Pipeline</div>
+            <div class="c-sub">Comercial Expansão · ordenado por mais antigo</div>
+          </div>
+          <button id="exp-ativos-sort" class="btn-pag" onclick="expAtivosAsc=!expAtivosAsc;expAtivosPage=0;renderExpAtivos(0)" style="white-space:nowrap">↓ Mais antigo</button>
+        </div>
+        <div id="exp-ativos-container">
+          <div class="empty-state">Aguardando dados...</div>
+        </div>
+        <p class="footnote">* Dias calculados desde a criação do lead — RD Station não exporta data de entrada por etapa.</p>
+      </div>
+
+      <!-- Lateral: por agente + pipeline etapas -->
+      <div class="card side-stack">
+        <div class="side-block">
           <div class="c-title">Por Agente</div>
-          <div class="c-sub">Leads ativos e perdas por responsável</div>
+          <div id="exp-resp-container">
+            <div class="empty-state">Aguardando dados...</div>
+          </div>
         </div>
-        <div id="exp-resp-container">
-          <div class="empty-state">Aguardando dados...</div>
-        </div>
-      </div>
 
-      <!-- Pipeline etapas -->
-      <div class="card">
-        <div class="card-header">
+        <div class="side-block">
           <div class="c-title">Em Andamento · Etapas</div>
-          <div class="c-sub">Leads ativos por etapa do funil</div>
-        </div>
-        <div id="exp-pipeline-container">
-          <div class="empty-state">Aguardando dados...</div>
+          <div id="exp-pipeline-container">
+            <div class="empty-state">Aguardando dados...</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1812,15 +1813,6 @@ function renderVisaoGeral() {
   renderCapitalDisponivel();
 }
 
-/* cor interpolada do vermelho (#C92B1E) ao dourado (#C8941A) conforme avança no funil */
-function funilColor(i, n) {
-  const t = n > 1 ? i / (n - 1) : 0;
-  const r = Math.round(201 + (200 - 201) * t);
-  const g = Math.round(43  + (148 - 43)  * t);
-  const b = Math.round(30  + (26  - 30)  * t);
-  return `rgb(${r},${g},${b})`;
-}
-
 function renderFunil() {
   const ativos = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento');
   const counts = {};
@@ -1830,37 +1822,50 @@ function renderFunil() {
     if (counts[e] !== undefined) counts[e]++;
   });
 
-  const n = ETAPAS_FUNIL.length;
-  const totalAtivos = ativos.length || 1;
-  /* cumulative[i] = leads ativos na etapa i ou em qualquer etapa posterior (proxy de "chegaram até aqui") */
-  const cumulative = ETAPAS_FUNIL.map((_, i) => ETAPAS_FUNIL.slice(i).reduce((s, e) => s + counts[e], 0));
+  const nSDR = ETAPAS_SDR.length;
   const max = Math.max(...Object.values(counts), 1);
 
-  const html = ETAPAS_FUNIL.map((etapa, i) => {
+  const cols = ETAPAS_FUNIL.map((etapa, i) => {
     const count = counts[etapa];
-    const pct = count > 0 ? Math.max(8, Math.round((count / max) * 100)) : 0;
-    const pctTotal = Math.round((count / totalAtivos) * 100);
-    const convPrev = i === 0 || !cumulative[i - 1]
-      ? null
-      : Math.round((cumulative[i] / cumulative[i - 1]) * 100);
-    const convTxt = convPrev === null
-      ? `${pctTotal}% do funil ativo`
-      : `${convPrev}% da etapa anterior · ${pctTotal}% do funil ativo`;
+    const pct = count > 0 ? Math.max(4, Math.round((count / max) * 100)) : 0;
+    const cor = i < nSDR ? 'var(--red)' : 'var(--gold)';
     const barHtml = count > 0
-      ? `<div class="funil-bar" style="width:${pct}%;background:${funilColor(i, n)}"><span class="funil-count">${count}</span></div>`
-      : `<span class="funil-zero">0</span>`;
+      ? `<div class="funil-col-bar" style="height:${pct}%;background:${cor}"></div>`
+      : `<div class="funil-col-zero">0</div>`;
+    const divider = i === nSDR ? '<div class="funil-divider"></div>' : '';
     return `
-      <div class="funil-item">
-        <div class="funil-label-wrap">
-          <div class="funil-label">${esc(etapa)}</div>
-          <div class="funil-conv">${convTxt}</div>
-        </div>
-        <div class="funil-bar-wrap">${barHtml}</div>
+      <div class="funil-col">
+        ${divider}
+        <div class="funil-col-num">${count}</div>
+        ${barHtml}
       </div>`;
   }).join('');
 
-  document.getElementById('funil-container').innerHTML = html +
-    '<p class="footnote">* Conversão calculada pela distribuição atual dos leads ativos — o RD Station não exporta histórico de passagem por etapa.</p>';
+  const labels = ETAPAS_FUNIL.map(e => `<div>${esc(ETAPA_SHORT[e] || e)}</div>`).join('');
+
+  /* resumo: conversão dentro de cada time (primeira etapa -> última etapa do time) e taxa geral de fechamento */
+  const convDentro = etapas => {
+    const primeira = counts[etapas[0]];
+    const ultima = counts[etapas[etapas.length - 1]];
+    return primeira > 0 ? (ultima / primeira) * 100 : 0;
+  };
+  const convSDR = convDentro(ETAPAS_SDR);
+  const convCom = convDentro(ETAPAS_COMERCIAL);
+  const taxaGeral = activeCRM.length > 0 ? (getFechadosFiltered().length / activeCRM.length * 100) : 0;
+
+  document.getElementById('funil-container').innerHTML = `
+    <div class="funil-legend">
+      <span class="funil-legend-item"><span class="funil-legend-dot" style="background:var(--red)"></span>SDR · Paloma</span>
+      <span class="funil-legend-item"><span class="funil-legend-dot" style="background:var(--gold)"></span>Comercial Expansão</span>
+    </div>
+    <div class="funil-chart">${cols}</div>
+    <div class="funil-labels">${labels}</div>
+    <div class="funil-resumo">
+      <div class="funil-resumo-item"><span class="funil-resumo-num">${fmtPct(convSDR)}</span><span class="funil-resumo-lbl">conversão dentro do SDR</span></div>
+      <div class="funil-resumo-item"><span class="funil-resumo-num">${fmtPct(convCom)}</span><span class="funil-resumo-lbl">conversão dentro do Comercial</span></div>
+      <div class="funil-resumo-item"><span class="funil-resumo-num" style="color:var(--green)">${fmtPct(taxaGeral)}</span><span class="funil-resumo-lbl">taxa de fechamento geral</span></div>
+    </div>
+    <p class="footnote">* Conversão calculada pela distribuição atual dos leads ativos — o RD Station não exporta histórico de passagem por etapa.</p>`;
 }
 
 function renderLeadsPorCidade() {
