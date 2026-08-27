@@ -1000,8 +1000,6 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
 <nav class="tabs-wrap">
   <div class="tabs">
     <div class="tab active"  onclick="switchTab('visao',this)">Visão Geral · Funil</div>
-    <div class="tab"         onclick="switchTab('sdr',this)">SDR · Paloma</div>
-    <div class="tab"         onclick="switchTab('expansao',this)">Comercial Expansão</div>
     <div class="tab"         onclick="switchTab('ads',this)">ADS &amp; Campanhas</div>
   </div>
 </nav>
@@ -1050,7 +1048,7 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
   <div class="panel-inner">
 
     <!-- KPIs -->
-    <div class="mkpi-row cols-4">
+    <div class="mkpi-row">
       <div class="mkpi">
         <div class="mkpi-v" id="vg-total">--</div>
         <div class="mkpi-l">Total de Leads</div>
@@ -1060,6 +1058,11 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
         <div class="mkpi-v" id="vg-ativos">--</div>
         <div class="mkpi-l">Ativos no Funil</div>
         <div class="mkpi-sub" id="vg-ativos-sub">em negociação · Expansão</div>
+      </div>
+      <div class="mkpi">
+        <div class="mkpi-v" id="vg-reunioes" style="color:var(--gold-lt)">--</div>
+        <div class="mkpi-l">Reuniões Marcadas</div>
+        <div class="mkpi-sub">chegaram em Reunião Agendada ou além</div>
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="vg-fechados" style="color:var(--green)">--</div>
@@ -1073,38 +1076,67 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       </div>
     </div>
 
+    <!-- Funil -->
+    <div class="card">
+      <div class="card-header">
+        <div class="c-title">Funil de Expansão · Expansão [V4]</div>
+        <div class="c-sub">SDR → Comercial · volume ativo por etapa</div>
+      </div>
+      <div id="funil-container">
+        <div class="empty-state">Aguardando dados...</div>
+      </div>
+    </div>
+
+    <!-- Leads por Dia -->
+    <div class="card">
+      <div class="card-header">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="c-title">Leads por Dia</div>
+            <div class="c-sub">Novos leads criados por dia · data de criação</div>
+          </div>
+          <div class="chart-legend" id="leg-timeline"></div>
+        </div>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="canvas-timeline"></canvas></div>
+      <div id="timeline-container" style="display:none">
+        <div class="empty-state">Aguardando dados...</div>
+      </div>
+    </div>
+
+    <!-- Top Cidades -->
+    <div class="card">
+      <div class="card-header">
+        <div class="c-title">Top Cidades</div>
+        <div class="c-sub">Cidade do lead · campo do RD CRM</div>
+      </div>
+      <div id="vg-cidade-container">
+        <div class="empty-state">Aguardando dados...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAINEL 2 — ADS & CAMPANHAS
+═══════════════════════════════════════════ -->
+<div id="panel-ads" class="tab-panel">
+  <div class="panel-inner">
+
+    <!-- Leads & Território -->
     <div class="grid-funil">
-      <!-- Funil -->
       <div class="card">
         <div class="card-header">
-          <div class="c-title">Funil de Expansão · Expansão [V4]</div>
-          <div class="c-sub">SDR → Comercial · volume ativo por etapa</div>
+          <div class="c-title">Leads por Território · SP</div>
+          <div class="c-sub">Concentração de leads por cidade no estado</div>
         </div>
-        <div id="funil-container">
+        <div id="ads-mapa-container">
           <div class="empty-state">Aguardando dados...</div>
         </div>
       </div>
 
-      <!-- Lateral: timeline + cidade + capital -->
       <div class="card side-stack">
-        <div class="side-block">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <div class="c-title" style="margin-bottom:0">Leads por Dia</div>
-            <div class="chart-legend" id="leg-timeline"></div>
-          </div>
-          <div class="chart-canvas-wrap" style="height:150px"><canvas id="canvas-timeline"></canvas></div>
-          <div id="timeline-container" style="display:none">
-            <div class="empty-state">Aguardando dados...</div>
-          </div>
-        </div>
-
-        <div class="side-block">
-          <div class="c-title">Top Cidades</div>
-          <div id="vg-cidade-container">
-            <div class="empty-state">Aguardando dados...</div>
-          </div>
-        </div>
-
         <div class="side-block">
           <div class="c-title">Capital Disponível</div>
           <div id="vg-capital-container">
@@ -1113,181 +1145,6 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
         </div>
       </div>
     </div>
-
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     PAINEL 2 — SDR / MIRIAN
-═══════════════════════════════════════════ -->
-<div id="panel-sdr" class="tab-panel">
-  <div class="panel-inner">
-
-    <!-- KPIs -->
-    <div class="mkpi-row cols-4">
-      <div class="mkpi">
-        <div class="mkpi-v" id="sdr-total">--</div>
-        <div class="mkpi-l">Leads Recebidos</div>
-        <div class="mkpi-sub">Total no CRM (SDR)</div>
-      </div>
-      <div class="mkpi">
-        <div class="mkpi-v" id="sdr-qualif">--</div>
-        <div class="mkpi-l">Qualificados</div>
-        <div class="mkpi-sub">Passaram para o Comercial</div>
-      </div>
-      <div class="mkpi">
-        <div class="mkpi-v" id="sdr-taxa">--</div>
-        <div class="mkpi-l">Taxa de Qualificação</div>
-        <div class="mkpi-sub">Qualificados ÷ total</div>
-      </div>
-      <div class="mkpi">
-        <div class="mkpi-v" id="sdr-fechados" style="color:var(--green)">--</div>
-        <div class="mkpi-l">Fechados</div>
-        <div class="mkpi-sub" id="sdr-fechados-sub">contratos assinados</div>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <!-- Motivos de perda SDR -->
-      <div class="card">
-        <div class="card-header">
-          <div class="c-title">Motivos de Perda — SDR</div>
-          <div class="c-sub">Leads perdidos nas etapas de SDR (Paloma)</div>
-        </div>
-        <div id="sdr-perda-container">
-          <div class="empty-state">Aguardando dados...</div>
-        </div>
-      </div>
-
-      <!-- Pipeline ativo SDR -->
-      <div class="card">
-        <div class="card-header">
-          <div class="c-title">Em Andamento · SDR</div>
-          <div class="c-sub">Novo MQL → Reunião Agendada</div>
-        </div>
-        <div id="sdr-pipeline-container">
-          <div class="empty-state">Aguardando dados...</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Qualificação por semana -->
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <div class="c-title" id="sdr-qualif-title">Qualificações do Mês</div>
-          <div class="c-sub" id="sdr-qualif-sub">Encaminhados à Expansão por semana do mês</div>
-        </div>
-        <div class="chart-legend" id="leg-sdr-qualif"></div>
-      </div>
-      <div class="chart-canvas-wrap"><canvas id="canvas-sdr-qualif"></canvas></div>
-      <div id="sdr-qualif-container" style="display:none">
-        <div class="empty-state">Aguardando dados...</div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     PAINEL 3 — TIME EXPANSÃO
-═══════════════════════════════════════════ -->
-<div id="panel-expansao" class="tab-panel">
-  <div class="panel-inner">
-
-    <!-- KPIs -->
-    <div class="mkpi-row cols-4">
-      <div class="mkpi">
-        <div class="mkpi-v" id="exp-total">--</div>
-        <div class="mkpi-l">Leads Recebidos</div>
-        <div class="mkpi-sub">Reunião Realizada → Pós-Vendas</div>
-      </div>
-      <div class="mkpi">
-        <div class="mkpi-v" id="exp-dias-cc">--</div>
-        <div class="mkpi-l">Média Dias — Proposta Enviada</div>
-        <div class="mkpi-sub">Leads ativos nessa etapa</div>
-      </div>
-      <div class="mkpi">
-        <div class="mkpi-v" id="exp-dias-ap">--</div>
-        <div class="mkpi-l">Média Dias — Implantação</div>
-        <div class="mkpi-sub">Leads ativos nessa etapa</div>
-      </div>
-      <div class="mkpi">
-        <div class="mkpi-v" id="exp-assin" style="color:var(--green)">--</div>
-        <div class="mkpi-l">Assinaturas</div>
-        <div class="mkpi-sub" id="exp-assin-valor">Contratos assinados</div>
-      </div>
-    </div>
-
-    <!-- Contratos Fechados -->
-    <div class="card">
-      <div class="card-header">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div class="c-title">Contratos Fechados</div>
-            <div class="c-sub">Negociações ganhas</div>
-          </div>
-          <span id="exp-fechados-total" style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--gold)"></span>
-        </div>
-      </div>
-      <div id="exp-fechados-container">
-        <div class="empty-state">Nenhum contrato fechado ainda.</div>
-      </div>
-    </div>
-
-    <div class="grid-funil">
-      <!-- Leads ativos com dias parados -->
-      <div class="card">
-        <div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-          <div>
-            <div class="c-title">Leads Ativos — Dias no Pipeline</div>
-            <div class="c-sub">Comercial Expansão · ordenado por mais antigo</div>
-          </div>
-          <button id="exp-ativos-sort" class="btn-pag" onclick="expAtivosAsc=!expAtivosAsc;expAtivosPage=0;renderExpAtivos(0)" style="white-space:nowrap">↓ Mais antigo</button>
-        </div>
-        <div id="exp-ativos-container">
-          <div class="empty-state">Aguardando dados...</div>
-        </div>
-        <p class="footnote">* Dias calculados desde a criação do lead — RD Station não exporta data de entrada por etapa.</p>
-      </div>
-
-      <!-- Lateral: por agente + pipeline etapas -->
-      <div class="card side-stack">
-        <div class="side-block">
-          <div class="c-title">Por Agente</div>
-          <div id="exp-resp-container">
-            <div class="empty-state">Aguardando dados...</div>
-          </div>
-        </div>
-
-        <div class="side-block">
-          <div class="c-title">Em Andamento · Etapas</div>
-          <div id="exp-pipeline-container">
-            <div class="empty-state">Aguardando dados...</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Motivos de perda expansão -->
-    <div class="card">
-      <div class="card-header">
-        <div class="c-title">Motivos de Perda — Time Expansão</div>
-        <div class="c-sub">Leads perdidos com responsável do time de expansão</div>
-      </div>
-      <div id="exp-perda-container">
-        <div class="empty-state">Aguardando dados...</div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     PAINEL 4 — ADS & CAMPANHAS
-═══════════════════════════════════════════ -->
-<div id="panel-ads" class="tab-panel">
-  <div class="panel-inner">
 
     <!-- KPIs -->
     <div class="mkpi-row cols-4">
@@ -1705,8 +1562,6 @@ function renderActive() {
   if (!panel) return;
   const id = panel.id;
   if (id === 'panel-visao')    renderVisaoGeral();
-  if (id === 'panel-sdr')      renderSDR();
-  if (id === 'panel-expansao') renderExpansao();
   if (id === 'panel-ads')      renderADS();
 }
 
@@ -1792,6 +1647,12 @@ function renderVisaoGeral() {
 
   const ativosNoFunil = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
 
+  /* reuniões marcadas = leads que chegaram em "Reunião Agendada" ou etapa posterior (independente do status atual) */
+  const reunioesMarcadas = activeCRM.filter(r => {
+    const etapa = normalizeEtapa(r);
+    return etapa === 'Reunião Agendada' || ETAPAS_COMERCIAL.includes(etapa);
+  }).length;
+
   const fechadosVG = getFechadosFiltered();
   const valorFechadoVG = fechadosVG.reduce((s, r) => s + normalizeValorUnico(r), 0);
 
@@ -1803,14 +1664,14 @@ function renderVisaoGeral() {
   const investTotal = rawADS.reduce((s, c) => s + (Number(c.spend) || 0), 0);
   const cpl = total > 0 ? investTotal / total : 0;
 
-  document.getElementById('vg-total').textContent  = total;
-  document.getElementById('vg-ativos').textContent = ativosNoFunil || '--';
-  document.getElementById('vg-cpl').textContent    = investTotal > 0 ? fmtBRL2(cpl) : '--';
+  document.getElementById('vg-total').textContent     = total;
+  document.getElementById('vg-ativos').textContent    = ativosNoFunil || '--';
+  document.getElementById('vg-reunioes').textContent  = reunioesMarcadas || '--';
+  document.getElementById('vg-cpl').textContent       = investTotal > 0 ? fmtBRL2(cpl) : '--';
 
   renderFunil();
   renderTimeline('timeline-container', activeCRM);
   renderLeadsPorCidade();
-  renderCapitalDisponivel();
 }
 
 function renderFunil() {
@@ -1912,6 +1773,87 @@ function renderCapitalDisponivel() {
       <thead><tr><th>Capital disponível</th><th class="right">Leads</th><th class="right">%</th></tr></thead>
       <tbody>${rows_html}</tbody>
     </table>`;
+}
+
+/* ══════════════════════════════════════════════
+   MAPA DE LEADS · SP (contorno real do estado, decimado a partir do
+   geojson público click_that_hood/brazil-states.geojson)
+══════════════════════════════════════════════ */
+const SP_MAPA_PATH = 'M 378.4,317.5 L 375.9,324.1 L 369.6,326.0 L 362.1,326.0 L 354.3,329.4 L 346.4,333.6 L 340.2,337.2 L 334.8,341.1 L 331.6,346.9 L 326.1,350.4 L 319.4,355.4 L 313.6,358.8 L 306.7,362.7 L 300.7,366.7 L 295.5,370.8 L 289.5,376.4 L 286.8,383.7 L 281.1,388.7 L 274.5,387.4 L 271.7,380.6 L 265.5,378.0 L 258.3,376.8 L 253.3,372.1 L 255.0,365.4 L 252.7,359.3 L 245.2,360.1 L 238.8,358.5 L 231.8,359.0 L 224.8,359.9 L 218.0,360.5 L 215.2,354.6 L 218.5,348.9 L 220.9,342.5 L 215.7,338.1 L 213.7,331.9 L 208.2,327.7 L 204.8,321.9 L 199.8,317.1 L 202.2,311.0 L 199.7,305.0 L 199.7,298.4 L 199.8,291.6 L 197.6,285.1 L 193.7,279.7 L 187.5,277.1 L 182.2,272.3 L 176.1,269.7 L 169.7,271.0 L 162.4,270.7 L 155.6,270.4 L 148.5,269.4 L 142.3,271.4 L 137.5,266.6 L 131.5,263.3 L 122.6,261.1 L 116.3,258.4 L 109.2,255.8 L 102.8,257.5 L 96.1,255.8 L 89.9,253.9 L 82.9,253.7 L 77.1,250.0 L 70.5,248.7 L 68.9,255.1 L 62.1,254.2 L 55.3,253.4 L 47.8,252.2 L 40.9,254.2 L 33.6,253.3 L 27.0,251.3 L 21.1,255.8 L 22.7,249.5 L 31.5,245.2 L 38.7,239.6 L 44.9,236.4 L 51.1,233.5 L 56.0,229.2 L 60.6,220.5 L 67.2,214.0 L 71.7,208.9 L 73.9,202.7 L 77.1,197.1 L 81.2,191.7 L 84.3,185.9 L 83.3,178.6 L 88.5,174.3 L 94.2,169.0 L 95.9,161.4 L 97.8,152.5 L 102.8,148.0 L 107.3,142.8 L 111.8,136.7 L 119.8,134.9 L 125.4,131.1 L 128.3,124.1 L 132.9,119.3 L 139.0,116.2 L 146.0,114.3 L 150.9,109.6 L 158.5,109.0 L 165.1,112.3 L 172.7,112.7 L 179.2,115.4 L 185.9,116.3 L 192.7,115.3 L 200.1,114.8 L 207.7,117.9 L 214.7,117.6 L 215.4,124.4 L 217.5,130.8 L 224.5,133.5 L 227.7,127.1 L 233.2,132.7 L 232.8,139.4 L 237.0,134.3 L 239.2,128.0 L 245.8,127.1 L 252.4,126.1 L 259.0,125.7 L 266.2,125.0 L 271.6,121.0 L 276.1,125.9 L 283.1,123.0 L 289.7,122.1 L 295.4,118.6 L 301.4,121.6 L 307.7,118.3 L 312.7,122.7 L 319.0,126.8 L 320.4,133.7 L 319.2,140.2 L 323.7,145.0 L 327.6,150.2 L 324.5,156.7 L 322.4,163.1 L 325.6,168.8 L 327.1,175.2 L 329.0,181.5 L 333.0,187.1 L 337.1,192.3 L 343.4,189.4 L 349.8,190.6 L 356.1,192.9 L 359.7,199.1 L 356.4,205.2 L 352.3,210.4 L 350.9,217.3 L 350.2,223.9 L 354.6,228.9 L 350.3,233.8 L 350.1,240.3 L 355.5,244.6 L 361.5,248.6 L 363.8,254.8 L 366.9,261.1 L 367.0,268.0 L 375.2,266.7 L 382.8,268.0 L 389.1,264.9 L 395.7,265.5 L 399.9,260.4 L 399.4,253.7 L 406.5,253.8 L 413.6,253.1 L 421.8,253.5 L 427.7,250.2 L 433.7,246.2 L 442.1,245.2 L 448.2,243.0 L 452.0,248.3 L 456.6,253.4 L 463.3,253.4 L 469.7,251.9 L 476.3,253.2 L 477.9,259.6 L 473.7,264.9 L 467.0,265.6 L 460.2,267.3 L 453.8,269.3 L 447.8,272.5 L 446.4,278.9 L 443.0,284.5 L 447.8,289.1 L 441.4,290.8 L 436.1,294.9 L 430.8,299.1 L 425.7,303.2 L 418.8,305.0 L 415.2,310.7 L 411.6,316.4 L 405.1,314.6 L 398.7,312.9 L 392.2,312.5 L 385.9,314.2 L 379.3,316.3 Z';
+
+/* coordenadas projetadas na mesma viewBox 0 0 500 500 do path acima */
+const CIDADE_COORDS = {
+  'sao paulo':    [352.9, 301.7],
+  'santos':       [368.3, 322.8],
+  'sorocaba':     [310.8, 299.2],
+  'votorantim':   [311.4, 301.5],
+  'santo andre':  [357.8, 307.5],
+  'diadema':      [353.4, 308.7],
+  'marilia':      [182.6, 233.0],
+  'bertioga':     [378.3, 317.3],
+};
+
+const ACCENT_MAP = { 'á':'a','à':'a','â':'a','ã':'a','ä':'a','é':'e','ê':'e','è':'e','í':'i','ì':'i','ó':'o','ô':'o','õ':'o','ò':'o','ú':'u','ù':'u','ü':'u','ç':'c' };
+function normKey(str) {
+  return (str || '').toLowerCase().trim().split('').map(ch => ACCENT_MAP[ch] || ch).join('');
+}
+
+function renderLeadsMapa() {
+  const counts = {};
+  const displayNames = {};
+  activeCRM.forEach(r => {
+    const cidade = normalizeCidade(r);
+    if (!cidade) return;
+    const key = normKey(cidade);
+    if (!CIDADE_COORDS[key]) return;
+    counts[key] = (counts[key] || 0) + 1;
+    if (!displayNames[key]) displayNames[key] = cidade.trim();
+  });
+
+  const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  if (!entries.length) {
+    document.getElementById('ads-mapa-container').innerHTML = '<div class="empty-state">Sem dados de localização mapeados.</div>';
+    return;
+  }
+
+  const max = Math.max(...entries.map(([, c]) => c), 1);
+  const totalMapa = entries.reduce((s, [, c]) => s + c, 0);
+
+  const circlesHtml = entries.map(([key, count]) => {
+    const [x, y] = CIDADE_COORDS[key];
+    const r = 7 + (count / max) * 22;
+    const nome = displayNames[key] || key;
+    return `
+      <circle cx="${x}" cy="${y}" r="${r.toFixed(1)}" fill="var(--red)" fill-opacity="0.5" stroke="var(--gold-lt)" stroke-width="1.2">
+        <title>${esc(nome)}: ${count} leads</title>
+      </circle>
+      <circle cx="${x}" cy="${y}" r="2" fill="var(--gold-lt)"/>`;
+  }).join('');
+
+  const legendHtml = entries.map(([key, count]) => {
+    const pct = totalMapa > 0 ? Math.round((count / totalMapa) * 100) : 0;
+    const nome = displayNames[key] || key;
+    return `
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:5px">
+          <span>${esc(nome)}</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;color:var(--txt)">${count}</span>
+        </div>
+        <div style="height:5px;background:rgba(255,200,120,0.08);border-radius:3px">
+          <div style="width:${pct}%;height:100%;background:var(--red);border-radius:3px"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('ads-mapa-container').innerHTML = `
+    <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+      <svg viewBox="0 0 500 500" style="width:320px;height:320px;flex-shrink:0">
+        <path d="${SP_MAPA_PATH}" fill="var(--bg3)" stroke="var(--border)" stroke-width="1.5"/>
+        ${circlesHtml}
+      </svg>
+      <div style="flex:1;min-width:220px;padding-top:4px">${legendHtml}</div>
+    </div>
+    <p class="footnote">* Contorno esquemático do estado de SP · apenas cidades mapeadas manualmente aparecem no mapa (as demais seguem na tabela de cidades da Visão Geral).</p>`;
 }
 
 /* ══════════════════════════════════════════════
@@ -2499,6 +2441,10 @@ function getAdsField(row, idx) {
 }
 
 function renderADS() {
+  /* Leads & Território — depende só do CRM, roda mesmo se a API de ADS estiver fora do ar */
+  renderCapitalDisponivel();
+  renderLeadsMapa();
+
   if (!rawADS.length) {
     ['ads-invest','ads-cpl','ads-leads','ads-fechados'].forEach(id => {
       document.getElementById(id).textContent = '--';
