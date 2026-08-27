@@ -1,0 +1,9 @@
+{
+  "name": "germania-crm-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Proxy serverless que expõe os dados do pipeline Expansão [V4] do RD Station CRM para o Dashboard Expansão da Germânia.",
+  "engines": {
+    "node": ">=18"
+  }
+}

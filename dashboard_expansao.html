@@ -426,15 +426,27 @@ body { background: var(--bg); color: var(--txt); }
   align-items: center;
   gap: 12px;
 }
+.funil-label-wrap {
+  width: 230px;
+  flex-shrink: 0;
+}
 .funil-label {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.3px;
   color: var(--txt-faint);
-  width: 220px;
-  flex-shrink: 0;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.funil-conv {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  color: var(--txt-faint);
+  opacity: 0.7;
+  margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -943,9 +955,9 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
 ═══════════════════════════════════════════ -->
 <nav class="tabs-wrap">
   <div class="tabs">
-    <div class="tab active"  onclick="switchTab('visao',this)">Visão Geral</div>
-    <div class="tab"         onclick="switchTab('sdr',this)">SDR / Mirian</div>
-    <div class="tab"         onclick="switchTab('expansao',this)">Time Expansão</div>
+    <div class="tab active"  onclick="switchTab('visao',this)">Visão Geral · Funil</div>
+    <div class="tab"         onclick="switchTab('sdr',this)">SDR · Paloma</div>
+    <div class="tab"         onclick="switchTab('expansao',this)">Comercial Expansão</div>
     <div class="tab"         onclick="switchTab('ads',this)">ADS &amp; Campanhas</div>
   </div>
 </nav>
@@ -1020,8 +1032,8 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
     <!-- Funil -->
     <div class="card">
       <div class="card-header">
-        <div class="c-title">Funil de Expansão</div>
-        <div class="c-sub">Volume de leads por etapa — excluindo perdidos</div>
+        <div class="c-title">Funil de Expansão · Expansão [V4]</div>
+        <div class="c-sub">Volume por etapa · % de conversão em relação à etapa anterior e ao total de leads</div>
       </div>
       <div id="funil-container" class="funil-row">
         <div class="empty-state">Aguardando dados...</div>
@@ -1045,6 +1057,30 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       </div>
     </div>
 
+    <div class="grid-2">
+      <!-- Leads por cidade -->
+      <div class="card">
+        <div class="card-header">
+          <div class="c-title">Leads por Cidade</div>
+          <div class="c-sub">Cidade do lead · campo do RD CRM</div>
+        </div>
+        <div id="vg-cidade-container">
+          <div class="empty-state">Aguardando dados...</div>
+        </div>
+      </div>
+
+      <!-- Capital disponível -->
+      <div class="card">
+        <div class="card-header">
+          <div class="c-title">Capital Disponível</div>
+          <div class="c-sub">Faixa de capital informada pelo lead</div>
+        </div>
+        <div id="vg-capital-container">
+          <div class="empty-state">Aguardando dados...</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1064,7 +1100,7 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       <div class="mkpi">
         <div class="mkpi-v" id="sdr-qualif">--</div>
         <div class="mkpi-l">Qualificados</div>
-        <div class="mkpi-sub">Encaminhados à Expansão</div>
+        <div class="mkpi-sub">Passaram para o Comercial</div>
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="sdr-taxa">--</div>
@@ -1083,7 +1119,7 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       <div class="card">
         <div class="card-header">
           <div class="c-title">Motivos de Perda — SDR</div>
-          <div class="c-sub">Leads perdidos com responsável SDR (Mirian)</div>
+          <div class="c-sub">Leads perdidos nas etapas de SDR (Paloma)</div>
         </div>
         <div id="sdr-perda-container">
           <div class="empty-state">Aguardando dados...</div>
@@ -1094,7 +1130,7 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       <div class="card">
         <div class="card-header">
           <div class="c-title">Em Andamento · SDR</div>
-          <div class="c-sub">Interesse Inicial + Coleta de Dados</div>
+          <div class="c-sub">Novo MQL → Reunião Agendada</div>
         </div>
         <div id="sdr-pipeline-container">
           <div class="empty-state">Aguardando dados...</div>
@@ -1131,16 +1167,16 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       <div class="mkpi">
         <div class="mkpi-v" id="exp-total">--</div>
         <div class="mkpi-l">Leads Recebidos</div>
-        <div class="mkpi-sub">Etapas 4–6</div>
+        <div class="mkpi-sub">Reunião Realizada → Pós-Vendas</div>
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="exp-dias-cc">--</div>
-        <div class="mkpi-l">Média Dias — Contato Comercial</div>
+        <div class="mkpi-l">Média Dias — Proposta Enviada</div>
         <div class="mkpi-sub">Leads ativos nessa etapa</div>
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="exp-dias-ap">--</div>
-        <div class="mkpi-l">Média Dias — Apresentação</div>
+        <div class="mkpi-l">Média Dias — Implantação</div>
         <div class="mkpi-sub">Leads ativos nessa etapa</div>
       </div>
       <div class="mkpi">
@@ -1156,7 +1192,7 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
         <div style="display:flex;align-items:center;justify-content:space-between">
           <div>
             <div class="c-title">Contratos Fechados</div>
-            <div class="c-sub">Assinatura do Contrato de Franquia</div>
+            <div class="c-sub">Negociações ganhas</div>
           </div>
           <span id="exp-fechados-total" style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--gold)"></span>
         </div>
@@ -1171,7 +1207,7 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       <div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
         <div>
           <div class="c-title">Leads Ativos — Dias no Pipeline</div>
-          <div class="c-sub">Contato Comercial e Apresentação · ordenado por mais antigo</div>
+          <div class="c-sub">Comercial Expansão · ordenado por mais antigo</div>
         </div>
         <button id="exp-ativos-sort" class="btn-pag" onclick="expAtivosAsc=!expAtivosAsc;expAtivosPage=0;renderExpAtivos(0)" style="white-space:nowrap">↓ Mais antigo</button>
       </div>
@@ -1301,10 +1337,8 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
 <script>
 'use strict';
 
-/* ─── URLs das planilhas — substituir antes do deploy ─── */
-const URLS = {
-  crm: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFZGcNG9xe0T8D8NM1pKdE8WsLLDg3vIyUmtIxRkYrkvXDM-Z9dv542SQN_Z5JoKORlzvZF0mC0hNc/pub?output=csv',
-};
+/* ─── APIs ─── */
+const CRM_PROXY = 'https://germania-crm-proxy-ecru.vercel.app';
 const ADS_API = 'https://germania-ads-dashboard-production.up.railway.app';
 
 /* ─── Estado global ─── */
@@ -1462,36 +1496,6 @@ function fmtTagPeriodo(de, ate) {
    HELPERS
 ══════════════════════════════════════════════ */
 
-function parseCSV(txt, delim) {
-  const lines = txt.replace(/\r/g, '').split('\n').filter(l => l.trim());
-  if (!lines.length) return [];
-  let start = 0;
-  if (lines[0].toLowerCase().startsWith('sep=')) start = 1;
-  const firstLine = lines[start].replace(/^﻿/, '');
-  const d = delim || (firstLine.indexOf(';') > -1 ? ';' : ',');
-  const hdr = splitLine(firstLine, d).map(h => h.trim().replace(/^"|"$/g, ''));
-  return lines.slice(start + 1).map(line => {
-    const vals = splitLine(line, d);
-    const obj = {};
-    hdr.forEach((h, i) => { obj[h] = (vals[i] || '').trim().replace(/^"|"$/g, ''); });
-    return obj;
-  }).filter(r => Object.values(r).some(v => v !== ''));
-}
-
-function splitLine(line, delim) {
-  const parts = [];
-  let cur = '';
-  let inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') { inQ = !inQ; }
-    else if (c === delim && !inQ) { parts.push(cur); cur = ''; }
-    else { cur += c; }
-  }
-  parts.push(cur);
-  return parts;
-}
-
 function parseDate(str) {
   if (!str) return null;
   const s = str.trim();
@@ -1526,16 +1530,6 @@ function classeDias(dias) {
   return 'dias-crit';
 }
 
-function isSDR(resp) {
-  const r = (resp || '').toLowerCase().trim();
-  return r === 'mirian';
-}
-
-function isExpansao(resp) {
-  const r = (resp || '').toLowerCase().trim().replace(/\s+/g, ' ');
-  return r === 'joaquim octavio' || r === 'antonio troleis';
-}
-
 function fmtBRL(v) {
   if (isNaN(v) || v === null) return '--';
   return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
@@ -1555,35 +1549,18 @@ function esc(str) {
   return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-const ETAPAS_FUNIL = [
-  'Interesse Inicial',
-  'Coleta de Dados',
-  'Encaminhamento para Expansão',
-  'Contato Comercial',
-  'Apresentação do Projeto de Viabilidade',
-  'Assinatura do Contrato de Franquia',
-];
-
-const ETAPAS_SDR = ['Interesse Inicial', 'Coleta de Dados'];
-const ETAPAS_FUNIL_ATIVO = ['Interesse Inicial', 'Coleta de Dados', 'Encaminhamento para Expansão', 'Contato Comercial'];
+const ETAPAS_SDR = ['Novo MQL', 'Em Tentativa de Contato', 'Em Contato', 'Interesse Identificado (SQL)', 'Reunião Agendada'];
+const ETAPAS_COMERCIAL = ['Reunião Realizada', 'Proposta Enviada', 'Proposta Aceita', 'Implantação', 'Pós-Vendas'];
+const ETAPAS_FUNIL = [...ETAPAS_SDR, ...ETAPAS_COMERCIAL];
 
 const ETAPA_SHORT = {
-  'Encaminhamento para Expansão':              'Encaminhamento',
-  'Contato Comercial':                         'Contato Comercial',
-  'Apresentação do Projeto de Viabilidade':    'Viabilidade',
-  'Assinatura do Contrato de Franquia':        'Assinatura',
+  'Em Tentativa de Contato':        'Tent. Contato',
+  'Interesse Identificado (SQL)':   'Interesse (SQL)',
+  'Reunião Agendada':               'Reunião Agend.',
+  'Reunião Realizada':              'Reunião Realiz.',
+  'Proposta Enviada':               'Proposta Env.',
+  'Proposta Aceita':                'Proposta Aceita',
 };
-
-/* Localização manual por nome de lead (não vem da planilha) */
-const LOCALIZACOES = {
-  'Fabiano Guidetti': 'Ribeirão Preto-SP',
-};
-const ETAPAS_EXP = [
-  'Encaminhamento para Expansão',
-  'Contato Comercial',
-  'Apresentação do Projeto de Viabilidade',
-  'Assinatura do Contrato de Franquia',
-];
 
 /* ══════════════════════════════════════════════
    FETCH
@@ -1594,22 +1571,15 @@ async function fetchAll() {
   showLoading(true);
   hideError();
 
-  const fetchOne = async (url, type) => {
-    if (!url || url.startsWith('PLACEHOLDER')) {
-      fetchErrors.push(`${type.toUpperCase()}: URL não configurada`);
-      return;
-    }
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const txt = await res.text();
-    const delim = ','; // Google Sheets publica sempre com vírgula
-    const data = parseCSV(txt, delim);
-    if (type === 'crm') rawCRM = data;
-    else rawADS = data;
+  const fetchCRM = async () => {
+    const res = await fetch(CRM_PROXY + '/api/deals', { cache: 'no-store' });
+    const json = await res.json();
+    if (!res.ok || json.error) throw new Error(json.error || ('HTTP ' + res.status));
+    rawCRM = json.deals || [];
   };
 
   const results = await Promise.allSettled([
-    fetchOne(URLS.crm, 'crm'),
+    fetchCRM(),
     loadADSfromAPI(),
   ]);
 
@@ -1718,89 +1688,59 @@ function renderHeader() {
   const fechadosHK = getFechadosFiltered();
   const valorHK    = fechadosHK.reduce((s, r) => s + normalizeValorUnico(r), 0);
   document.getElementById('hk-total').textContent       = total  || '--';
-  const ativosHK = activeCRM.filter(r =>
-    ETAPAS_FUNIL_ATIVO.includes(normalizeEtapa(r)) && normalizeEstado(r) === 'Em Andamento'
-  ).length;
+  const ativosHK = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
   document.getElementById('hk-ativos').textContent = ativosHK || '--';
   document.getElementById('hk-assinaturas').textContent = fechadosHK.length || '--';
   document.getElementById('hk-assinaturas-sub').textContent =
     valorHK > 0 ? fmtBRL(valorHK) : 'franquias fechadas';
 }
 
-/* ── helpers de campo ── */
-function getField(row, ...candidates) {
-  for (const c of candidates) {
-    if (row[c] !== undefined && row[c] !== '') return (row[c] || '').trim();
-  }
-  return '';
-}
-
+/* ── helpers de campo — dados já vêm normalizados do proxy do RD CRM ── */
 function normalizeEtapa(row) {
-  return getField(row, 'Etapa', 'etapa', 'ETAPA').trim();
+  return row.stage || '';
 }
 
 function normalizeEstado(row) {
-  return getField(row, 'Estado', 'Estado ', 'ESTADO').trim();
+  if (row.status === 'ganho') return 'Ganho';
+  if (row.status === 'perdido') return 'Perdida';
+  return 'Em Andamento';
 }
 
 function normalizeResp(row) {
-  return getField(row, 'Responsável', 'Responsavel', 'responsavel').trim();
+  return row.owner || '';
 }
 
 function normalizeMotivo(row) {
-  return getField(row, 'Motivo de Perda', 'Motivo de perda', 'motivo de perda').trim();
+  return row.lostReason || '';
 }
 
 function normalizeFonte(row) {
-  return getField(row, 'Fonte', 'fonte').trim();
+  return row.source || '';
 }
 
 function normalizeDataCriacao(row) {
-  for (const c of ['Data de criação', 'Data de criacao', 'data de criação', 'Data de Criação']) {
-    if (row[c] !== undefined) return (row[c] || '').trim();
-  }
-  const key = Object.keys(row).find(k => k.toLowerCase().includes('cria'));
-  return key ? (row[key] || '').trim() : '';
-}
-
-function normalizeTelefone(row) {
-  return getField(row, 'Telefone', 'telefone').trim();
-}
-
-function normalizeValorUnico(row) {
-  const s = getField(row, 'Valor Único', 'Valor Unico', 'valor único', 'valor unico').trim();
-  if (!s || s === '0' || s === '0,0') return 0;
-  let v = s.replace(/[R$\s]/g, '');
-  if (/,\d{1,2}$/.test(v)) {
-    // pt-BR: 150.000,00 → remove pontos de milhar, troca vírgula por ponto
-    v = v.replace(/\./g, '').replace(',', '.');
-  } else {
-    const dots = (v.match(/\./g) || []).length;
-    if (dots === 1 && /\.\d{1,2}$/.test(v)) {
-      // Ponto decimal neutro: 150000.0 ou 150000.00 → manter como está
-    } else {
-      // Sem ponto ou pontos de milhar BR: 150000 / 150.000 / 1.500.000
-      v = v.replace(/\./g, '');
-    }
-  }
-  return parseFloat(v) || 0;
-}
-
-function normalizeProdutos(row) {
-  return getField(row, 'Produtos', 'produtos').trim();
+  return row.createdAt || '';
 }
 
 function normalizeDataFechamento(row) {
-  return getField(row, 'Data de Fechamento', 'Data de fechamento', 'data de fechamento').trim();
+  return row.closedAt || '';
 }
 
-function normalizeFunil(row) {
-  return getField(row, 'Funil de vendas', 'funil de vendas').trim();
+function normalizeValorUnico(row) {
+  return Number(row.amountTotal) || 0;
 }
 
-/* Retorna leads fechados filtrados por Data de Fechamento quando disponível */
+function normalizeCidade(row) {
+  return row.cidadeDoLead || '';
+}
+
+function normalizeCapital(row) {
+  return row.capitalDisponivel || '';
+}
+
+/* Retorna leads ganhos, filtrados por data de fechamento quando disponível */
 function getFechadosFiltered() {
-  const todos = rawCRM.filter(r => normalizeEtapa(r) === 'Assinatura do Contrato de Franquia');
+  const todos = rawCRM.filter(r => r.status === 'ganho');
   if (!filtroDe && !filtroAte) return todos;
   return todos.filter(r => {
     const df = normalizeDataFechamento(r);
@@ -1811,7 +1751,7 @@ function getFechadosFiltered() {
       if (filtroAte && d > filtroAte) return false;
       return true;
     }
-    return true; // sem Data de Fechamento → inclui sempre
+    return true; // sem data de fechamento → inclui sempre
   });
 }
 
@@ -1819,26 +1759,10 @@ function getFechadosFiltered() {
    TAB 1: VISÃO GERAL
 ══════════════════════════════════════════════ */
 
-function computeQualif() {
-  return activeCRM.filter(r => {
-    const funil = normalizeFunil(r);
-    if (funil && funil !== '*Expansão Rede') return false;
-    const etapa = normalizeEtapa(r);
-    const resp  = normalizeResp(r);
-    if (etapa === 'Encaminhamento para Expansão') return true;
-    if (ETAPAS_EXP.includes(etapa) && isExpansao(resp)) return true;
-    if (normalizeEstado(r) === 'Perdida' && etapa === 'Perdidos' && isExpansao(resp)) return true;
-    return false;
-  }).length;
-}
-
 function renderVisaoGeral() {
   const total = activeCRM.length;
 
-  /* ativos no funil = Em Andamento em Interesse Inicial, Coleta de Dados, Encaminhamento para Expansão ou Contato Comercial */
-  const ativosNoFunil = activeCRM.filter(r =>
-    ETAPAS_FUNIL_ATIVO.includes(normalizeEtapa(r)) && normalizeEstado(r) === 'Em Andamento'
-  ).length;
+  const ativosNoFunil = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
 
   const fechadosVG = getFechadosFiltered();
   const valorFechadoVG = fechadosVG.reduce((s, r) => s + normalizeValorUnico(r), 0);
@@ -1857,37 +1781,106 @@ function renderVisaoGeral() {
 
   renderFunil();
   renderTimeline('timeline-container', activeCRM);
+  renderLeadsPorCidade();
+  renderCapitalDisponivel();
+}
+
+/* cor interpolada do vermelho (#C92B1E) ao dourado (#C8941A) conforme avança no funil */
+function funilColor(i, n) {
+  const t = n > 1 ? i / (n - 1) : 0;
+  const r = Math.round(201 + (200 - 201) * t);
+  const g = Math.round(43  + (148 - 43)  * t);
+  const b = Math.round(30  + (26  - 30)  * t);
+  return `rgb(${r},${g},${b})`;
 }
 
 function renderFunil() {
+  const ativos = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento');
   const counts = {};
   ETAPAS_FUNIL.forEach(e => { counts[e] = 0; });
-  activeCRM.forEach(r => {
+  ativos.forEach(r => {
     const e = normalizeEtapa(r);
     if (counts[e] !== undefined) counts[e]++;
   });
 
+  const n = ETAPAS_FUNIL.length;
+  const totalAtivos = ativos.length || 1;
+  /* cumulative[i] = leads ativos na etapa i ou em qualquer etapa posterior (proxy de "chegaram até aqui") */
+  const cumulative = ETAPAS_FUNIL.map((_, i) => ETAPAS_FUNIL.slice(i).reduce((s, e) => s + counts[e], 0));
   const max = Math.max(...Object.values(counts), 1);
-  const colors = [
-    '#C92B1E', '#CC3D22', '#CE5028',
-    '#C87A1A', '#C88E1A', '#C8941A',
-  ];
 
   const html = ETAPAS_FUNIL.map((etapa, i) => {
     const count = counts[etapa];
     const pct = Math.max(8, Math.round((count / max) * 100));
+    const pctTotal = Math.round((count / totalAtivos) * 100);
+    const convPrev = i === 0 || !cumulative[i - 1]
+      ? null
+      : Math.round((cumulative[i] / cumulative[i - 1]) * 100);
+    const convTxt = convPrev === null
+      ? `${pctTotal}% do funil ativo`
+      : `${convPrev}% da etapa anterior · ${pctTotal}% do funil ativo`;
     return `
       <div class="funil-item">
-        <div class="funil-label">${esc(etapa)}</div>
+        <div class="funil-label-wrap">
+          <div class="funil-label">${esc(etapa)}</div>
+          <div class="funil-conv">${convTxt}</div>
+        </div>
         <div class="funil-bar-wrap">
-          <div class="funil-bar" style="width:${pct}%;background:${colors[i]}">
+          <div class="funil-bar" style="width:${pct}%;background:${funilColor(i, n)}">
             <span class="funil-count">${count}</span>
           </div>
         </div>
       </div>`;
   }).join('');
 
-  document.getElementById('funil-container').innerHTML = html;
+  document.getElementById('funil-container').innerHTML = html +
+    '<p class="footnote">* Conversão calculada pela distribuição atual dos leads ativos — o RD Station não exporta histórico de passagem por etapa.</p>';
+}
+
+function renderLeadsPorCidade() {
+  const counts = {};
+  activeCRM.forEach(r => {
+    const c = normalizeCidade(r) || 'Não informado';
+    counts[c] = (counts[c] || 0) + 1;
+  });
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const total = activeCRM.length;
+  if (!sorted.length) {
+    document.getElementById('vg-cidade-container').innerHTML = '<div class="empty-state">Sem dados.</div>';
+    return;
+  }
+  const rows_html = sorted.map(([cidade, count]) => {
+    const pct = total > 0 ? ((count / total) * 100).toFixed(1) : '0';
+    return `<tr><td>${esc(cidade)}</td><td class="right">${count}</td><td class="right">${pct}%</td></tr>`;
+  }).join('');
+  document.getElementById('vg-cidade-container').innerHTML = `
+    <table class="ez-table">
+      <thead><tr><th>Cidade</th><th class="right">Leads</th><th class="right">%</th></tr></thead>
+      <tbody>${rows_html}</tbody>
+    </table>`;
+}
+
+function renderCapitalDisponivel() {
+  const counts = {};
+  activeCRM.forEach(r => {
+    const c = normalizeCapital(r) || 'Não informado';
+    counts[c] = (counts[c] || 0) + 1;
+  });
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const total = activeCRM.length;
+  if (!sorted.length) {
+    document.getElementById('vg-capital-container').innerHTML = '<div class="empty-state">Sem dados.</div>';
+    return;
+  }
+  const rows_html = sorted.map(([faixa, count]) => {
+    const pct = total > 0 ? ((count / total) * 100).toFixed(1) : '0';
+    return `<tr><td>${esc(faixa)}</td><td class="right">${count}</td><td class="right">${pct}%</td></tr>`;
+  }).join('');
+  document.getElementById('vg-capital-container').innerHTML = `
+    <table class="ez-table">
+      <thead><tr><th>Capital disponível</th><th class="right">Leads</th><th class="right">%</th></tr></thead>
+      <tbody>${rows_html}</tbody>
+    </table>`;
 }
 
 /* ══════════════════════════════════════════════
@@ -2053,7 +2046,7 @@ function renderTimeline(containerId, rows) {
 
 function renderSDR() {
   const total    = activeCRM.length;
-  const qualif   = activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r))).length;
+  const qualif   = activeCRM.filter(r => ETAPAS_COMERCIAL.includes(normalizeEtapa(r))).length;
   const taxa     = total > 0 ? (qualif / total) * 100 : 0;
   const fechados = getFechadosFiltered().length;
 
@@ -2064,11 +2057,9 @@ function renderSDR() {
   document.getElementById('sdr-fechados-sub').textContent =
     qualif > 0 ? `de ${qualif} qualificados` : 'contratos assinados';
 
-  const perdaSDR = activeCRM.filter(r => {
-    if (normalizeEstado(r) !== 'Perdida') return false;
-    const etapa = normalizeEtapa(r);
-    return etapa === 'Perdidos' || ETAPAS_SDR.includes(etapa);
-  });
+  const perdaSDR = activeCRM.filter(r =>
+    normalizeEstado(r) === 'Perdida' && ETAPAS_SDR.includes(normalizeEtapa(r))
+  );
   renderMotivoPerda('sdr-perda-container', perdaSDR);
 
   renderPipelineAtivo(
@@ -2099,7 +2090,7 @@ function renderQualifPorSemana() {
   /* semana do mês: S1=dias 1-7, S2=8-14, S3=15-21, S4=22+ (cap em 3) */
   const semIdx = d => Math.min(Math.floor((d.getDate() - 1) / 7), 3);
 
-  const qualif = rawCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
+  const qualif = rawCRM.filter(r => ETAPAS_COMERCIAL.includes(normalizeEtapa(r)));
   const currC  = [0, 0, 0, 0];
   const prevC  = [0, 0, 0, 0];
 
@@ -2289,14 +2280,14 @@ function renderPipelineAtivo(containerId, allRows, etapas) {
 ══════════════════════════════════════════════ */
 
 function renderExpansao() {
-  const expRows  = activeCRM.filter(r => ETAPAS_EXP.includes(normalizeEtapa(r)));
+  const expRows  = activeCRM.filter(r => ETAPAS_COMERCIAL.includes(normalizeEtapa(r)));
   const ativos   = expRows.filter(r => normalizeEstado(r) === 'Em Andamento');
   const fechadosExp = getFechadosFiltered();
   const assin    = fechadosExp.length;
 
   /* Média de dias por etapa */
-  const cc = ativos.filter(r => normalizeEtapa(r) === 'Contato Comercial');
-  const ap = ativos.filter(r => normalizeEtapa(r) === 'Apresentação do Projeto de Viabilidade');
+  const cc = ativos.filter(r => normalizeEtapa(r) === 'Proposta Enviada');
+  const ap = ativos.filter(r => normalizeEtapa(r) === 'Implantação');
 
   const avg = arr => arr.length
     ? Math.round(arr.reduce((s, r) => s + diasNoPipeline(normalizeDataCriacao(r)), 0) / arr.length)
@@ -2313,12 +2304,12 @@ function renderExpansao() {
 
   /* Perdas Expansão (para motivos) */
   const perdaExp = activeCRM.filter(r =>
-    normalizeEstado(r) === 'Perdida' && ETAPAS_EXP.includes(normalizeEtapa(r))
+    normalizeEstado(r) === 'Perdida' && ETAPAS_COMERCIAL.includes(normalizeEtapa(r))
   );
 
   /* Tabela ativos com dias parados — paginada */
   expAtivosData = ativos.map(r => ({
-    nome:  getField(r, 'Nome', 'nome') || 'Sem nome',
+    nome:  r.name || 'Sem nome',
     etapa: normalizeEtapa(r),
     resp:  normalizeResp(r),
     dias:  diasNoPipeline(normalizeDataCriacao(r)),
@@ -2330,12 +2321,12 @@ function renderExpansao() {
   /* Contratos fechados — filtrados por Data de Fechamento quando disponível */
   const fechadosRows = getFechadosFiltered()
     .map(r => ({
-      nome:        getField(r, 'Nome', 'nome') || 'Sem nome',
+      nome:        r.name || 'Sem nome',
       resp:        normalizeResp(r),
       valor:       normalizeValorUnico(r),
       dataFech:    normalizeDataFechamento(r),
       dataCriacao: normalizeDataCriacao(r),
-      local:       LOCALIZACOES[getField(r, 'Nome', 'nome')] || '—',
+      local:       normalizeCidade(r) || '—',
     }))
     .sort((a, b) => b.valor - a.valor);
 
@@ -2373,7 +2364,7 @@ function renderExpansao() {
   renderResponsaveis('exp-resp-container', expRows);
 
   /* Pipeline etapas */
-  renderPipelineAtivo('exp-pipeline-container', expRows, ETAPAS_EXP);
+  renderPipelineAtivo('exp-pipeline-container', expRows, ETAPAS_COMERCIAL);
 
   /* Motivos de perda expansão */
   renderMotivoPerda('exp-perda-container', perdaExp);
@@ -2430,9 +2421,11 @@ function renderResponsaveis(containerId, rows) {
   const map = {};
   rows.forEach(r => {
     const resp = normalizeResp(r) || 'Desconhecido';
-    if (!map[resp]) map[resp] = { total: 0, perdidos: 0, ativos: 0 };
+    if (!map[resp]) map[resp] = { total: 0, perdidos: 0, ativos: 0, ganhos: 0 };
     map[resp].total++;
-    if (normalizeEstado(r) === 'Perdida') map[resp].perdidos++;
+    const estado = normalizeEstado(r);
+    if (estado === 'Perdida') map[resp].perdidos++;
+    else if (estado === 'Ganho') map[resp].ganhos++;
     else map[resp].ativos++;
   });
   const sorted = Object.entries(map).sort((a, b) => b[1].total - a[1].total);
@@ -2447,6 +2440,9 @@ function renderResponsaveis(containerId, rows) {
     const pct     = totalAll > 0 ? ((d.total / totalAll) * 100).toFixed(1) : '0';
     const pctNum  = totalAll > 0 ? Math.round(d.total / totalAll * 100) : 0;
     const pctPerd = d.total > 0 ? Math.round(d.perdidos / d.total * 100) : 0;
+    const subParts = [`${d.ativos} ativos`];
+    if (d.ganhos > 0) subParts.push(`${d.ganhos} ganhos`);
+    subParts.push(`${d.perdidos} perd. (${pctPerd}%)`);
     return `
     <div class="resp-row">
       <div class="resp-header">
@@ -2454,7 +2450,7 @@ function renderResponsaveis(containerId, rows) {
         <span class="resp-kpi"><span class="resp-num">${d.total}</span><span class="resp-pct-tag">${pctNum}%</span></span>
       </div>
       <div class="resp-track"><div class="resp-fill" style="width:${pct}%"></div></div>
-      <div class="resp-sub">${d.ativos} ativos · ${d.perdidos} perd. (${pctPerd}%)</div>
+      <div class="resp-sub">${subParts.join(' · ')}</div>
     </div>`;
   }).join('');
 
