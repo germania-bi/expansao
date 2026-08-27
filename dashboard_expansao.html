@@ -1065,14 +1065,14 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
         <div class="mkpi-sub">chegaram em Reunião Agendada ou além</div>
       </div>
       <div class="mkpi">
+        <div class="mkpi-v" id="vg-taxa-conv">--</div>
+        <div class="mkpi-l">Taxa de Conversão</div>
+        <div class="mkpi-sub">fechados ÷ total de leads</div>
+      </div>
+      <div class="mkpi">
         <div class="mkpi-v" id="vg-fechados" style="color:var(--green)">--</div>
         <div class="mkpi-l">Fechados</div>
         <div class="mkpi-sub" id="vg-fechados-valor">Contratos assinados</div>
-      </div>
-      <div class="mkpi">
-        <div class="mkpi-v" id="vg-cpl">--</div>
-        <div class="mkpi-l">CPL Médio</div>
-        <div class="mkpi-sub">Investimento ADS ÷ leads</div>
       </div>
     </div>
 
@@ -1087,30 +1087,43 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       </div>
     </div>
 
-    <!-- Leads por Dia -->
-    <div class="card">
-      <div class="card-header">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div class="c-title">Leads por Dia</div>
-            <div class="c-sub">Novos leads criados por dia · data de criação</div>
+    <div class="grid-2">
+      <!-- Leads por Dia -->
+      <div class="card">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div class="c-title">Leads por Dia</div>
+              <div class="c-sub">Novos leads criados por dia · data de criação</div>
+            </div>
+            <div class="chart-legend" id="leg-timeline"></div>
           </div>
-          <div class="chart-legend" id="leg-timeline"></div>
+        </div>
+        <div class="chart-canvas-wrap"><canvas id="canvas-timeline"></canvas></div>
+        <div id="timeline-container" style="display:none">
+          <div class="empty-state">Aguardando dados...</div>
         </div>
       </div>
-      <div class="chart-canvas-wrap"><canvas id="canvas-timeline"></canvas></div>
-      <div id="timeline-container" style="display:none">
-        <div class="empty-state">Aguardando dados...</div>
+
+      <!-- Capital Disponível -->
+      <div class="card">
+        <div class="card-header">
+          <div class="c-title">Capital Disponível</div>
+          <div class="c-sub">Faixa de capital informada pelo lead</div>
+        </div>
+        <div id="vg-capital-container">
+          <div class="empty-state">Aguardando dados...</div>
+        </div>
       </div>
     </div>
 
-    <!-- Top Cidades -->
+    <!-- Leads por Território -->
     <div class="card">
       <div class="card-header">
-        <div class="c-title">Top Cidades</div>
-        <div class="c-sub">Cidade do lead · campo do RD CRM</div>
+        <div class="c-title">Leads por Território · SP</div>
+        <div class="c-sub">Concentração de leads por cidade no estado</div>
       </div>
-      <div id="vg-cidade-container">
+      <div id="vg-mapa-container">
         <div class="empty-state">Aguardando dados...</div>
       </div>
     </div>
@@ -1123,28 +1136,6 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
 ═══════════════════════════════════════════ -->
 <div id="panel-ads" class="tab-panel">
   <div class="panel-inner">
-
-    <!-- Leads & Território -->
-    <div class="grid-funil">
-      <div class="card">
-        <div class="card-header">
-          <div class="c-title">Leads por Território · SP</div>
-          <div class="c-sub">Concentração de leads por cidade no estado</div>
-        </div>
-        <div id="ads-mapa-container">
-          <div class="empty-state">Aguardando dados...</div>
-        </div>
-      </div>
-
-      <div class="card side-stack">
-        <div class="side-block">
-          <div class="c-title">Capital Disponível</div>
-          <div id="vg-capital-container">
-            <div class="empty-state">Aguardando dados...</div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- KPIs -->
     <div class="mkpi-row cols-4">
@@ -1660,18 +1651,17 @@ function renderVisaoGeral() {
   document.getElementById('vg-fechados-valor').textContent =
     valorFechadoVG > 0 ? fmtBRL(valorFechadoVG) : 'Contratos assinados';
 
-  /* CPL: investimento ADS (API) / total leads CRM */
-  const investTotal = rawADS.reduce((s, c) => s + (Number(c.spend) || 0), 0);
-  const cpl = total > 0 ? investTotal / total : 0;
+  const taxaConv = total > 0 ? (fechadosVG.length / total) * 100 : 0;
 
   document.getElementById('vg-total').textContent     = total;
   document.getElementById('vg-ativos').textContent    = ativosNoFunil || '--';
   document.getElementById('vg-reunioes').textContent  = reunioesMarcadas || '--';
-  document.getElementById('vg-cpl').textContent       = investTotal > 0 ? fmtBRL2(cpl) : '--';
+  document.getElementById('vg-taxa-conv').textContent = fmtPct(taxaConv);
 
   renderFunil();
   renderTimeline('timeline-container', activeCRM);
-  renderLeadsPorCidade();
+  renderCapitalDisponivel();
+  renderLeadsMapa();
 }
 
 function renderFunil() {
@@ -1812,7 +1802,7 @@ function renderLeadsMapa() {
 
   const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
   if (!entries.length) {
-    document.getElementById('ads-mapa-container').innerHTML = '<div class="empty-state">Sem dados de localização mapeados.</div>';
+    document.getElementById('vg-mapa-container').innerHTML = '<div class="empty-state">Sem dados de localização mapeados.</div>';
     return;
   }
 
@@ -1845,7 +1835,7 @@ function renderLeadsMapa() {
       </div>`;
   }).join('');
 
-  document.getElementById('ads-mapa-container').innerHTML = `
+  document.getElementById('vg-mapa-container').innerHTML = `
     <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
       <svg viewBox="0 0 500 500" style="width:320px;height:320px;flex-shrink:0">
         <path d="${SP_MAPA_PATH}" fill="var(--bg3)" stroke="var(--border)" stroke-width="1.5"/>
@@ -2441,10 +2431,6 @@ function getAdsField(row, idx) {
 }
 
 function renderADS() {
-  /* Leads & Território — depende só do CRM, roda mesmo se a API de ADS estiver fora do ar */
-  renderCapitalDisponivel();
-  renderLeadsMapa();
-
   if (!rawADS.length) {
     ['ads-invest','ads-cpl','ads-leads','ads-fechados'].forEach(id => {
       document.getElementById(id).textContent = '--';
