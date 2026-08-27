@@ -45,11 +45,11 @@ body {
   --border:    rgba(255,200,120,0.10);
 }
 :root[data-theme="light"] {
-  --bg:        #F8F2E8;
-  --bg2:       #EFE6D4;
-  --bg3:       #E5D9C2;
-  --card-bg:   #FFFFFF;
-  --card-bd:   rgba(100,70,20,0.15);
+  --bg:        #F0E8D6;
+  --bg2:       #E8DECA;
+  --bg3:       #DDD1B9;
+  --card-bg:   #FEFCF7;
+  --card-bd:   rgba(100,70,20,0.12);
   --txt:       #2A1C08;
   --txt-faint: rgba(42,28,8,0.5);
   --gold:      #C8941A;
@@ -475,6 +475,15 @@ body { background: var(--bg); color: var(--txt); }
   color: rgba(255,255,255,0.9);
   white-space: nowrap;
 }
+.funil-zero {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--txt-faint);
+  padding-left: 10px;
+  line-height: 28px;
+  display: inline-block;
+}
 
 /* ══════════════════════════════════════════════
    GRÁFICO DE BARRAS (SVG simples)
@@ -533,26 +542,44 @@ body { background: var(--bg); color: var(--txt); }
 /* ══════════════════════════════════════════════
    LIGHT MODE OVERRIDES
 ══════════════════════════════════════════════ */
+/* — KPI cards — */
+:root[data-theme="light"] .mkpi {
+  border-left: 3px solid var(--gold);
+  border-color: rgba(100,70,20,0.10);
+  padding-left: 17px;
+  box-shadow: 0 1px 8px rgba(100,70,20,0.09);
+}
+:root[data-theme="light"] .mkpi-v { color: var(--txt); }
+/* — Content cards — */
+:root[data-theme="light"] .card {
+  border-color: rgba(100,70,20,0.10);
+  box-shadow: 0 1px 8px rgba(100,70,20,0.07);
+}
 :root[data-theme="light"] .card-header {
-  background: var(--bg2);
+  background: var(--card-bg);
+  border-bottom-color: rgba(100,70,20,0.10);
 }
-:root[data-theme="light"] .funil-bar-wrap {
-  background: var(--bg3);
-}
+/* — Funil — */
+:root[data-theme="light"] .funil-bar-wrap { background: rgba(100,70,20,0.07); }
+/* — Pipeline cards — */
 :root[data-theme="light"] .pipe-card {
-  background: var(--bg2);
-  border-color: rgba(100,70,20,0.18);
+  background: var(--card-bg);
+  border-color: rgba(100,70,20,0.13);
+  box-shadow: 0 1px 4px rgba(100,70,20,0.06);
 }
+:root[data-theme="light"] .pipe-card-num  { color: var(--txt); }
+:root[data-theme="light"] .resp-num       { color: var(--txt); }
+:root[data-theme="light"] .bar-label strong { color: var(--txt); }
 :root[data-theme="light"] .pipe-card-pct,
-:root[data-theme="light"] .resp-pct-tag {
-  color: var(--txt-faint);
-}
-:root[data-theme="light"] .ez-table td {
-  border-bottom: 1px solid var(--border);
-}
-:root[data-theme="light"] .ez-table tr:hover td {
-  background: var(--bg2);
-}
+:root[data-theme="light"] .resp-pct-tag { color: var(--txt-faint); }
+:root[data-theme="light"] .pipe-card-bar { background: rgba(100,70,20,0.09); }
+/* — Progress tracks — */
+:root[data-theme="light"] .bar-track   { background: rgba(100,70,20,0.09); }
+:root[data-theme="light"] .resp-track  { background: rgba(100,70,20,0.09); }
+/* — Tables — */
+:root[data-theme="light"] .ez-table td { border-bottom: 1px solid var(--border); }
+:root[data-theme="light"] .ez-table tr:hover td { background: var(--bg2); }
+/* — Alerts / status chips — */
 :root[data-theme="light"] .alert-box {
   background: rgba(201,43,30,0.06);
   border-color: rgba(201,43,30,0.25);
@@ -561,17 +588,17 @@ body { background: var(--bg); color: var(--txt); }
 :root[data-theme="light"] .alert-box strong { color: var(--red); }
 :root[data-theme="light"] .chip-paused { background: rgba(200,148,26,0.15); color: #7A5808; }
 :root[data-theme="light"] .chip-active  { background: rgba(46,125,82,0.12);  color: #1E5E3A; }
-:root[data-theme="light"] .dias-warn    { background: rgba(200,148,26,0.15); color: #7A5808; }
-:root[data-theme="light"] .dias-crit    { background: rgba(201,43,30,0.12);  color: #9B2218; }
-:root[data-theme="light"] .leg-line-d   { border-top-color: rgba(42,28,8,0.35); }
-:root[data-theme="light"] .c-title      { background: rgba(200,148,26,0.12); border-color: rgba(200,148,26,0.40); }
-:root[data-theme="light"] .mkpi         { box-shadow: 0 1px 4px rgba(100,70,20,0.08); }
-:root[data-theme="light"] .card         { box-shadow: 0 1px 4px rgba(100,70,20,0.08); }
-:root[data-theme="light"] .hk           { background: rgba(0,0,0,0.18); }
-:root[data-theme="light"] .empty-state  { color: var(--txt-faint); }
-:root[data-theme="light"] .bar-track    { background: var(--bg3); }
-:root[data-theme="light"] .pipe-card-bar { background: var(--bg3); }
-:root[data-theme="light"] .resp-track   { background: var(--bg3); }
+:root[data-theme="light"] .dias-warn   { background: rgba(200,148,26,0.15); color: #7A5808; }
+:root[data-theme="light"] .dias-crit   { background: rgba(201,43,30,0.12);  color: #9B2218; }
+/* — Toggle tema — */
+:root[data-theme="light"] .dark-toggle-lbl   { color: rgba(42,28,8,0.50); }
+:root[data-theme="light"] .dark-toggle-track { background: rgba(42,28,8,0.22); }
+:root[data-theme="light"] .dark-toggle-thumb { box-shadow: 0 1px 3px rgba(42,28,8,0.30); }
+/* — Misc — */
+:root[data-theme="light"] .leg-line-d  { border-top-color: rgba(42,28,8,0.35); }
+:root[data-theme="light"] .c-title     { background: rgba(200,148,26,0.12); border-color: rgba(200,148,26,0.40); }
+:root[data-theme="light"] .hk          { background: rgba(0,0,0,0.18); }
+:root[data-theme="light"] .empty-state { color: var(--txt-faint); }
 :root[data-theme="light"] .chart-canvas-wrap { background: transparent; }
 
 .pag-controls {
@@ -1811,7 +1838,7 @@ function renderFunil() {
 
   const html = ETAPAS_FUNIL.map((etapa, i) => {
     const count = counts[etapa];
-    const pct = Math.max(8, Math.round((count / max) * 100));
+    const pct = count > 0 ? Math.max(8, Math.round((count / max) * 100)) : 0;
     const pctTotal = Math.round((count / totalAtivos) * 100);
     const convPrev = i === 0 || !cumulative[i - 1]
       ? null
@@ -1819,17 +1846,16 @@ function renderFunil() {
     const convTxt = convPrev === null
       ? `${pctTotal}% do funil ativo`
       : `${convPrev}% da etapa anterior · ${pctTotal}% do funil ativo`;
+    const barHtml = count > 0
+      ? `<div class="funil-bar" style="width:${pct}%;background:${funilColor(i, n)}"><span class="funil-count">${count}</span></div>`
+      : `<span class="funil-zero">0</span>`;
     return `
       <div class="funil-item">
         <div class="funil-label-wrap">
           <div class="funil-label">${esc(etapa)}</div>
           <div class="funil-conv">${convTxt}</div>
         </div>
-        <div class="funil-bar-wrap">
-          <div class="funil-bar" style="width:${pct}%;background:${funilColor(i, n)}">
-            <span class="funil-count">${count}</span>
-          </div>
-        </div>
+        <div class="funil-bar-wrap">${barHtml}</div>
       </div>`;
   }).join('');
 
@@ -2436,26 +2462,26 @@ function renderResponsaveis(containerId, rows) {
     return;
   }
 
-  const items = sorted.map(([resp, d]) => {
-    const pct     = totalAll > 0 ? ((d.total / totalAll) * 100).toFixed(1) : '0';
-    const pctNum  = totalAll > 0 ? Math.round(d.total / totalAll * 100) : 0;
-    const pctPerd = d.total > 0 ? Math.round(d.perdidos / d.total * 100) : 0;
+  const cards = sorted.map(([resp, d]) => {
+    const pct     = totalAll > 0 ? Math.round(d.total / totalAll * 100) : 0;
+    const pctPerd = d.total  > 0 ? Math.round(d.perdidos / d.total * 100) : 0;
     const subParts = [`${d.ativos} ativos`];
     if (d.ganhos > 0) subParts.push(`${d.ganhos} ganhos`);
     subParts.push(`${d.perdidos} perd. (${pctPerd}%)`);
     return `
-    <div class="resp-row">
-      <div class="resp-header">
-        <span class="resp-name">${esc(resp)}</span>
-        <span class="resp-kpi"><span class="resp-num">${d.total}</span><span class="resp-pct-tag">${pctNum}%</span></span>
-      </div>
-      <div class="resp-track"><div class="resp-fill" style="width:${pct}%"></div></div>
-      <div class="resp-sub">${subParts.join(' · ')}</div>
-    </div>`;
+      <div class="pipe-card">
+        <div class="pipe-card-label">${esc(resp)}</div>
+        <div class="pipe-card-num">${d.total}</div>
+        <div class="pipe-card-bar"><div class="pipe-card-bar-fill" style="width:${pct}%"></div></div>
+        <div class="pipe-card-pct">${subParts.join(' · ')}</div>
+      </div>`;
   }).join('');
 
   document.getElementById(containerId).innerHTML =
-    `<div class="pipe-total" style="padding:10px 16px 0;text-align:right">${totalAll} leads no período</div><div class="resp-list">${items}</div>`;
+    `<div class="pipe-stat-wrap">
+      <div class="pipe-total">${totalAll} leads no período</div>
+      <div class="pipe-cards pipe-cards-grid">${cards}</div>
+    </div>`;
 }
 
 /* ══════════════════════════════════════════════
