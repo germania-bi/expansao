@@ -872,7 +872,7 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
           <div class="hk-sub" id="hk-ativos-sub">Reunião Agendada ou além</div>
         </div>
         <div class="hk">
-          <div class="hk-l">Fechados</div>
+          <div class="hk-l">Unidades Vendidas</div>
           <div class="hk-v" id="hk-assinaturas" style="color:var(--green)">--</div>
           <div class="hk-sub" id="hk-assinaturas-sub">franquias fechadas</div>
         </div>
@@ -953,9 +953,9 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
         <div class="mkpi-sub">reuniões marcadas ÷ qualificados</div>
       </div>
       <div class="mkpi">
-        <div class="mkpi-v" id="vg-fechados" style="color:var(--green)">--</div>
-        <div class="mkpi-l">Fechados</div>
-        <div class="mkpi-sub" id="vg-fechados-valor">Contratos assinados</div>
+        <div class="mkpi-v" id="vg-reunioes-concluidas">--</div>
+        <div class="mkpi-l">% Reuniões Concluídas</div>
+        <div class="mkpi-sub">reuniões realizadas ÷ reuniões marcadas</div>
       </div>
     </div>
 
@@ -1513,20 +1513,19 @@ function renderVisaoGeral() {
     return etapa === 'Reunião Agendada' || ETAPAS_COMERCIAL.includes(etapa);
   }).length;
 
-  const fechadosVG = getFechadosFiltered();
-  const valorFechadoVG = fechadosVG.reduce((s, r) => s + normalizeValorUnico(r), 0);
-
-  document.getElementById('vg-fechados').textContent = fechadosVG.length || '--';
-  document.getElementById('vg-fechados-valor').textContent =
-    valorFechadoVG > 0 ? fmtBRL(valorFechadoVG) : 'Contratos assinados';
+  /* reuniões realizadas = leads que já chegaram no Comercial (a reunião marcada aconteceu) */
+  const reunioesRealizadas = activeCRM.filter(r => ETAPAS_COMERCIAL.includes(normalizeEtapa(r))).length;
 
   /* taxa de conversão = reuniões marcadas ÷ qualificados */
   const taxaConv = qualificados > 0 ? (reunioesMarcadas / qualificados) * 100 : 0;
+  /* % reuniões concluídas = reuniões realizadas ÷ reuniões marcadas */
+  const pctReunioesConcluidas = reunioesMarcadas > 0 ? (reunioesRealizadas / reunioesMarcadas) * 100 : 0;
 
-  document.getElementById('vg-total').textContent     = total;
-  document.getElementById('vg-ativos').textContent    = qualificados || '--';
-  document.getElementById('vg-reunioes').textContent  = reunioesMarcadas || '--';
-  document.getElementById('vg-taxa-conv').textContent = fmtPct(taxaConv);
+  document.getElementById('vg-total').textContent              = total;
+  document.getElementById('vg-ativos').textContent             = qualificados || '--';
+  document.getElementById('vg-reunioes').textContent           = reunioesMarcadas || '--';
+  document.getElementById('vg-taxa-conv').textContent          = fmtPct(taxaConv);
+  document.getElementById('vg-reunioes-concluidas').textContent = fmtPct(pctReunioesConcluidas);
 
   renderFunil();
   renderTimeline('timeline-container', activeCRM);
