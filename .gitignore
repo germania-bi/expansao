@@ -4,3 +4,5 @@ dashboard_expansao_SPEC.md
 PROMPT_ABERTURA_CLAUDE_CODE.md
 crm-proxy/.vercel/
 crm-proxy/node_modules/
+ads-proxy/.vercel/
+ads-proxy/node_modules/

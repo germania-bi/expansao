@@ -1,0 +1,9 @@
+{
+  "name": "germania-ads-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Proxy serverless que expõe métricas de campanhas do Meta Ads (Graph API) para o Dashboard Expansão da Germânia.",
+  "engines": {
+    "node": ">=18"
+  }
+}
