@@ -980,9 +980,9 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
           <div class="hk-sub" id="hk-total-sub">no período</div>
         </div>
         <div class="hk">
-          <div class="hk-l">Ativos no Funil</div>
+          <div class="hk-l">Reuniões Marcadas</div>
           <div class="hk-v" id="hk-ativos">--</div>
-          <div class="hk-sub" id="hk-ativos-sub">em negociação · Expansão</div>
+          <div class="hk-sub" id="hk-ativos-sub">Reunião Agendada ou além</div>
         </div>
         <div class="hk">
           <div class="hk-l">Fechados</div>
@@ -1563,8 +1563,11 @@ function renderHeader() {
   const fechadosHK = getFechadosFiltered();
   const valorHK    = fechadosHK.reduce((s, r) => s + normalizeValorUnico(r), 0);
   document.getElementById('hk-total').textContent       = total  || '--';
-  const ativosHK = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
-  document.getElementById('hk-ativos').textContent = ativosHK || '--';
+  const reunioesHK = activeCRM.filter(r => {
+    const etapa = normalizeEtapa(r);
+    return etapa === 'Reunião Agendada' || ETAPAS_COMERCIAL.includes(etapa);
+  }).length;
+  document.getElementById('hk-ativos').textContent = reunioesHK || '--';
   document.getElementById('hk-assinaturas').textContent = fechadosHK.length || '--';
   document.getElementById('hk-assinaturas-sub').textContent =
     valorHK > 0 ? fmtBRL(valorHK) : 'franquias fechadas';
