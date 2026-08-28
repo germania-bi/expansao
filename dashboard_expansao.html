@@ -1056,8 +1056,8 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="vg-ativos">--</div>
-        <div class="mkpi-l">Ativos no Funil</div>
-        <div class="mkpi-sub" id="vg-ativos-sub">em negociação · Expansão</div>
+        <div class="mkpi-l">Qualificados</div>
+        <div class="mkpi-sub" id="vg-ativos-sub">chegaram em Interesse (SQL) ou além</div>
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="vg-reunioes" style="color:var(--gold-lt)">--</div>
@@ -1067,7 +1067,7 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       <div class="mkpi">
         <div class="mkpi-v" id="vg-taxa-conv">--</div>
         <div class="mkpi-l">Taxa de Conversão</div>
-        <div class="mkpi-sub">fechados ÷ total de leads</div>
+        <div class="mkpi-sub">fechados ÷ reuniões marcadas</div>
       </div>
       <div class="mkpi">
         <div class="mkpi-v" id="vg-fechados" style="color:var(--green)">--</div>
@@ -1636,7 +1636,9 @@ function getFechadosFiltered() {
 function renderVisaoGeral() {
   const total = activeCRM.length;
 
-  const ativosNoFunil = activeCRM.filter(r => normalizeEstado(r) === 'Em Andamento').length;
+  /* qualificados = leads que chegaram em "Interesse Identificado (SQL)" ou etapa posterior (independente do status atual) */
+  const idxQualificado = ETAPAS_FUNIL.indexOf('Interesse Identificado (SQL)');
+  const qualificados = activeCRM.filter(r => ETAPAS_FUNIL.indexOf(normalizeEtapa(r)) >= idxQualificado).length;
 
   /* reuniões marcadas = leads que chegaram em "Reunião Agendada" ou etapa posterior (independente do status atual) */
   const reunioesMarcadas = activeCRM.filter(r => {
@@ -1651,10 +1653,11 @@ function renderVisaoGeral() {
   document.getElementById('vg-fechados-valor').textContent =
     valorFechadoVG > 0 ? fmtBRL(valorFechadoVG) : 'Contratos assinados';
 
-  const taxaConv = total > 0 ? (fechadosVG.length / total) * 100 : 0;
+  /* taxa de conversão = fechados ÷ reuniões marcadas (não ÷ total de leads) */
+  const taxaConv = reunioesMarcadas > 0 ? (fechadosVG.length / reunioesMarcadas) * 100 : 0;
 
   document.getElementById('vg-total').textContent     = total;
-  document.getElementById('vg-ativos').textContent    = ativosNoFunil || '--';
+  document.getElementById('vg-ativos').textContent    = qualificados || '--';
   document.getElementById('vg-reunioes').textContent  = reunioesMarcadas || '--';
   document.getElementById('vg-taxa-conv').textContent = fmtPct(taxaConv);
 
