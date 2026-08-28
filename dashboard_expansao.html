@@ -44,24 +44,6 @@ body {
   --amber:     #FFA62C;
   --border:    rgba(255,200,120,0.10);
 }
-:root[data-theme="light"] {
-  --bg:        #F0E8D6;
-  --bg2:       #E8DECA;
-  --bg3:       #DDD1B9;
-  --card-bg:   #FEFCF7;
-  --card-bd:   rgba(100,70,20,0.12);
-  --txt:       #2A1C08;
-  --txt-faint: rgba(42,28,8,0.5);
-  --gold:      #C8941A;
-  --gold-lt:   #E0A82C;
-  --red:       #C92B1E;
-  --red-gd:    linear-gradient(#7A1208 0%, #A82218 40%, #C92B1E 100%);
-  --red-bg:    rgba(201,43,30,0.08);
-  --circ-bg:   #EFE6D4;
-  --green:     #2E7D52;
-  --amber:     #C8941A;
-  --border:    rgba(100,70,20,0.15);
-}
 
 body { background: var(--bg); color: var(--txt); }
 
@@ -167,41 +149,6 @@ body { background: var(--bg); color: var(--txt); }
   gap: 12px;
   margin-left: auto;
 }
-.dark-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  user-select: none;
-}
-.dark-toggle-lbl {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: rgba(255,230,200,0.6);
-}
-.dark-toggle-track {
-  width: 34px;
-  height: 18px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 9px;
-  position: relative;
-  transition: background 0.2s;
-}
-:root[data-theme="dark"] .dark-toggle-track { background: rgba(255,166,44,0.4); }
-.dark-toggle-thumb {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 14px;
-  height: 14px;
-  background: #fff;
-  border-radius: 50%;
-  transition: transform 0.2s;
-}
-:root[data-theme="dark"] .dark-toggle-thumb { transform: translateX(16px); }
 
 /* ══════════════════════════════════════════════
    TABS
@@ -557,66 +504,6 @@ body { background: var(--bg); color: var(--txt); }
 .resp-sub { font-size: 11px; color: var(--txt-faint); }
 /* legend dot */
 .leg-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; flex-shrink: 0; vertical-align: middle; }
-
-/* ══════════════════════════════════════════════
-   LIGHT MODE OVERRIDES
-══════════════════════════════════════════════ */
-/* — KPI cards — */
-:root[data-theme="light"] .mkpi {
-  border-color: rgba(100,70,20,0.10);
-}
-:root[data-theme="light"] .mkpi-row { box-shadow: 0 1px 8px rgba(100,70,20,0.09); }
-:root[data-theme="light"] .mkpi-v { color: var(--txt); }
-/* — Content cards — */
-:root[data-theme="light"] .card {
-  border-color: rgba(100,70,20,0.10);
-  box-shadow: 0 1px 8px rgba(100,70,20,0.07);
-}
-:root[data-theme="light"] .card-header {
-  background: var(--card-bg);
-  border-bottom-color: rgba(100,70,20,0.10);
-}
-/* — Funil — */
-:root[data-theme="light"] .funil-chart { border-bottom-color: rgba(100,70,20,0.14); }
-:root[data-theme="light"] .funil-col-num { color: var(--txt); }
-/* — Pipeline cards — */
-:root[data-theme="light"] .pipe-card {
-  background: var(--card-bg);
-  border-color: rgba(100,70,20,0.13);
-  box-shadow: 0 1px 4px rgba(100,70,20,0.06);
-}
-:root[data-theme="light"] .pipe-card-num  { color: var(--txt); }
-:root[data-theme="light"] .resp-num       { color: var(--txt); }
-:root[data-theme="light"] .bar-label strong { color: var(--txt); }
-:root[data-theme="light"] .pipe-card-pct,
-:root[data-theme="light"] .resp-pct-tag { color: var(--txt-faint); }
-:root[data-theme="light"] .pipe-card-bar { background: rgba(100,70,20,0.09); }
-/* — Progress tracks — */
-:root[data-theme="light"] .bar-track   { background: rgba(100,70,20,0.09); }
-:root[data-theme="light"] .resp-track  { background: rgba(100,70,20,0.09); }
-/* — Tables — */
-:root[data-theme="light"] .ez-table td { border-bottom: 1px solid var(--border); }
-:root[data-theme="light"] .ez-table tr:hover td { background: var(--bg2); }
-/* — Alerts / status chips — */
-:root[data-theme="light"] .alert-box {
-  background: rgba(201,43,30,0.06);
-  border-color: rgba(201,43,30,0.25);
-  color: #7A1208;
-}
-:root[data-theme="light"] .alert-box strong { color: var(--red); }
-:root[data-theme="light"] .chip-paused { background: rgba(200,148,26,0.15); color: #7A5808; }
-:root[data-theme="light"] .chip-active  { background: rgba(46,125,82,0.12);  color: #1E5E3A; }
-:root[data-theme="light"] .dias-warn   { background: rgba(200,148,26,0.15); color: #7A5808; }
-:root[data-theme="light"] .dias-crit   { background: rgba(201,43,30,0.12);  color: #9B2218; }
-/* — Toggle tema — */
-:root[data-theme="light"] .dark-toggle-lbl   { color: rgba(42,28,8,0.50); }
-:root[data-theme="light"] .dark-toggle-track { background: rgba(42,28,8,0.22); }
-:root[data-theme="light"] .dark-toggle-thumb { box-shadow: 0 1px 3px rgba(42,28,8,0.30); }
-/* — Misc — */
-:root[data-theme="light"] .leg-line-d  { border-top-color: rgba(42,28,8,0.35); }
-:root[data-theme="light"] .hk          { background: rgba(0,0,0,0.18); }
-:root[data-theme="light"] .empty-state { color: var(--txt-faint); }
-:root[data-theme="light"] .chart-canvas-wrap { background: transparent; }
 
 .pag-controls {
   display: flex;
@@ -1034,10 +921,6 @@ span.flatpickr-weekday { background: var(--bg2) !important; color: var(--txt-fai
       <button class="btn-sh" id="fc-tudo"    onclick="setShortcut('all',this)">Tudo</button>
     </div>
     <button class="btn-limpar" id="btn-limpar" onclick="setShortcut('all',document.getElementById('fc-tudo'))">× Limpar</button>
-    <label class="dark-toggle" onclick="toggleDark()" title="Alternar tema" style="margin-left:auto">
-      <span class="dark-toggle-lbl" id="dark-lbl-bar">Claro</span>
-      <span class="dark-toggle-track"><span class="dark-toggle-thumb"></span></span>
-    </label>
   </div>
 </div>
 
@@ -1504,38 +1387,18 @@ function switchTab(name, el) {
   renderActive();
 }
 
-/* ══════════════════════════════════════════════
-   DARK MODE
-══════════════════════════════════════════════ */
-
-function isLight() {
-  return document.documentElement.getAttribute('data-theme') === 'light';
-}
-
 function chartCfg() {
-  const light = isLight();
   return {
-    tick:      light ? 'rgba(42,28,8,0.55)'        : '#A89870',
-    grid:      light ? 'rgba(42,28,8,0.07)'         : 'rgba(255,200,120,0.06)',
-    dataLabel: light ? 'rgba(42,28,8,0.65)'         : 'rgba(241,227,206,0.55)',
-    tooltip:   light ? 'rgba(240,234,220,0.97)'     : 'rgba(26,18,8,0.92)',
-    ttTitle:   light ? '#7A1208'                    : '#FFA62C',
-    ttBody:    light ? '#2A1C08'                    : '#F1E3CE',
-    ttBorder:  light ? 'rgba(100,70,20,0.25)'       : 'rgba(255,166,44,0.2)',
-    prevLine:  light ? 'rgba(42,28,8,0.35)'         : 'rgba(241,227,206,0.35)',
-    prevPt:    light ? 'rgba(42,28,8,0.45)'         : 'rgba(241,227,206,0.5)',
+    tick:      '#A89870',
+    grid:      'rgba(255,200,120,0.06)',
+    dataLabel: 'rgba(241,227,206,0.55)',
+    tooltip:   'rgba(26,18,8,0.92)',
+    ttTitle:   '#FFA62C',
+    ttBody:    '#F1E3CE',
+    ttBorder:  'rgba(255,166,44,0.2)',
+    prevLine:  'rgba(241,227,206,0.35)',
+    prevPt:    'rgba(241,227,206,0.5)',
   };
-}
-
-function toggleDark() {
-  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
-  const next = cur === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('germania-dark-expansao', next);
-  const lbl = next === 'dark' ? 'Claro' : 'Escuro';
-  const el = document.getElementById('dark-lbl-bar');
-  if (el) el.textContent = lbl;
-  renderAll();
 }
 
 /* ══════════════════════════════════════════════
@@ -2628,12 +2491,6 @@ function renderFontesCRM() {
 ══════════════════════════════════════════════ */
 
 (function init() {
-  /* Restaurar tema */
-  const theme = localStorage.getItem('germania-dark-expansao') || 'dark';
-  document.documentElement.setAttribute('data-theme', theme);
-  const darkLbl = document.getElementById('dark-lbl-bar');
-  if (darkLbl) darkLbl.textContent = theme === 'dark' ? 'Claro' : 'Escuro';
-
   /* Inicializar Flatpickr */
   if (typeof flatpickr !== 'undefined') initFlatpickr();
 
